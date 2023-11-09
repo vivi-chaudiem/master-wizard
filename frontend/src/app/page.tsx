@@ -1,59 +1,51 @@
 'use client'
-import {
-  useState
-} from 'react'
+import { useState } from 'react'
 
 export default function Home() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState('')
   const [loading, setLoading] = useState(false)
 
-  async function createIndexAndEmbeddings() {
+  const createIndexAndEmbeddings = async () => {
     try {
-      const result = await fetch("../../api/setup", {
-        method: "POST"
-      })
-      const json = await result.json()
-      console.log("result: ", json)
+      const result = await fetch('http://localhost:5000/setup', {
+        method: 'POST'
+      });
+      const json = await result.json();
+      console.log('result: ', json);
     } catch (error) {
-      console.error("error: ", error)
+      console.error('error: ', error);
     }
-  }
+  };
 
-  async function sendQuery() {
-    if (!query) return
+  const sendQuery = async () => {
+    if (!query) return;
 
-    setResults('')
-    setLoading(true)
-
-    // try {
-    //   const result = await fetch("/api/read", {
-    //     method: "POST",
-    //     body: JSON.stringify(query)
-    // })
+    setResults('');
+    setLoading(true);
 
     try {
-      const result = await fetch("/api/read", {
-          method: "POST",
-          body: JSON.stringify(query),
-          headers: {
-              "Content-Type": "application/json"
-          }
+      const result = await fetch('http://localhost:5000/query_pinecone', {
+        method: 'POST',
+        body: JSON.stringify(query),
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
 
       if (!result.ok) {
-          throw new Error(`HTTP error! Status: ${result.status}`);
+        throw new Error(`HTTP error! Status: ${result.status}`);
       }
 
-    const json = await result.json()
+      const json = await result.json();
 
-    setResults(json)
-    setLoading(false)
+      setResults(json);
+      setLoading(false);
     } catch (error) {
-      console.error("error: ", error)
-      setLoading(false)
+      console.error('error: ', error);
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <main className="flex flex-col items-center justify-between p-24">
