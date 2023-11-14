@@ -3,6 +3,10 @@ from pinecone.pinecone_service import PineconeService
 
 def setup_read_routes(app, pinecone_api_key, pinecone_env, pinecone_index_name):
 
+    @app.route('/query_pinecone', methods=['OPTIONS'])  # Handle OPTIONS requests
+    def handle_preflight():
+        return '', 204  # Respond with a 204 No Content status code
+
     @app.route('/query_pinecone', methods=['POST'])
     def query_pinecone():
         # Get the request body data
@@ -12,15 +16,16 @@ def setup_read_routes(app, pinecone_api_key, pinecone_env, pinecone_index_name):
         question = body['question']
 
         # Query the Pinecone index
+        print("Querying Pinecone vector store in read.py...")
         pinecone_service = PineconeService(pinecone_api_key, pinecone_env)
         response = pinecone_service.query_index(pinecone_index_name, question)
 
         # Create a response object
         response_obj = jsonify(response)
 
-        # Set CORS headers to allow requests from 'http://localhost:3000'
-        response_obj.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
-        response_obj.headers['Access-Control-Allow-Methods'] = 'POST'
-        response_obj.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+        # # Set CORS headers to allow requests from 'http://localhost:3000'
+        # response_obj.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+        # response_obj.headers['Access-Control-Allow-Methods'] = 'POST'
+        # response_obj.headers['Access-Control-Allow-Headers'] = 'Content-Type'
 
         return response_obj

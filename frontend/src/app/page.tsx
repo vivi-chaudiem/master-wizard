@@ -9,7 +9,10 @@ export default function Home() {
   const createIndexAndEmbeddings = async () => {
     try {
       const result = await fetch('http://localhost:5000/setup', {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+          'Origin': 'http://localhost:3000',
+        }
       });
       const json = await result.json();
       console.log('result: ', json);
@@ -27,9 +30,10 @@ export default function Home() {
     try {
       const result = await fetch('http://localhost:5000/query_pinecone', {
         method: 'POST',
-        body: JSON.stringify(query),
+        body: JSON.stringify({ question: query }),  // Wrap the query in an object
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Origin': 'http://localhost:3000'
         }
       });
 
