@@ -33,12 +33,11 @@ def main():
 
     # 2. Production steps
     production_steps_response = run_production_steps_chain(llm, product)
-    validated_production_steps = validate_steps(production_steps_response)
+    validated_production_steps = validate_steps(production_steps_response, "Produktionsschritte")
 
     # 3. Roles
     roles_response = run_roles_chain(llm, product, validated_production_steps)
-    print("\nRollen:")
-    print(roles_response)
+    validated_roles = validate_steps(roles_response, "Rollen")
 
     # 4. Skills
     # Load background information
@@ -49,8 +48,9 @@ def main():
     skills_json_template_path = "backend/documents/skills_json_description.txt"
     skills_json_template = read_file(skills_json_template_path)
 
-    skills_response = run_skills_chain(llm, product, roles_response, validated_production_steps, background_info, skills_json_template)
-    print("\nFähigkeiten:")
+    skills_response = run_skills_chain(llm, product, validated_roles, validated_production_steps, background_info, skills_json_template)
+    validate_steps(skills_response, "Fähigkeiten")
+
     print(skills_response)
 
 if __name__ == '__main__':

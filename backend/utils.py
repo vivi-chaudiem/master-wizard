@@ -2,11 +2,11 @@ def read_file(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
         return file.read()
     
-def validate_steps(steps):
+def validate_steps(steps, name):
     steps_list = steps.split('\n')
     
     while True:
-        print("\nAktuelle Arbeitsschritte:")
+        print("\n" + name + ":")
         for idx, step in enumerate(steps_list, start=1):
             print(f"{idx}. {step}")
 
