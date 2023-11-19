@@ -1,0 +1,13 @@
+Jeder 'Arbeitsschritt' sollte einer Rolle aus {roles} zugeordnet werden und für jede Rolle sollen relevante Fähigkeiten in die Kategorien 'Basiskompetenzen', 'Methodenkompetenzen', 'Funktionale Kompetenzen' und 'Soft Skills' eingeordnet werden.
+
+Beispiel für eine ausgefüllte Vorlage: 
+{{
+    "Arbeitsschritt": "",
+    "Rolle": "",
+    "Kompetenzen": {{
+      "Basiskompetenzen": [],
+      "Methodenkompetenzen": [],
+      "Funktionale Kompetenzen": [],
+      "Soft Skills": []
+    }}
+}}

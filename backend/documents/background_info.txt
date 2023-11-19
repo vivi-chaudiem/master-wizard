@@ -1,25 +1,11 @@
-1. Basiskompetenzen: Basiskompetenzen sind die grundlegenden Fähigkeiten und Qualifikationen, die Produktionsmitarbeitende benötigen, um ihre Aufgaben effektiv wahrzunehmen. Dazu gehören:
-- Sicherheitskenntnisse: Wissen über Sicherheitsvorschriften, um Unfälle zu vermeiden.
-- Grundlegende mathematische Fähigkeiten: Verständnis von Messungen, Berechnungen und Dimensionen.
-- Kommunikationsfähigkeiten: Fähigkeit zur klaren und effektiven Kommunikation im Team.
-- Teamarbeit: Die Fähigkeit, in einem Team zu arbeiten und effektiv zu kooperieren.
-- Zeitmanagement: Effiziente Nutzung der Arbeitszeit und Einhaltung von Zeitplänen.
+1. Basiskompetenzen:
+Basiskompetenzen sind die grundlegenden Fähigkeiten und Kenntnisse, die Mitarbeitende benötigen, um ihre Aufgaben im Produktionsprozess effektiv auszuführen.
 
-2. Methodenkompetenzen: Methodenkompetenzen beziehen sich auf spezifische Arbeitsmethoden und Techniken, die in der Produktion angewendet werden. Dazu gehören:
-- Bedienung von Maschinen und Werkzeugen: Fertigkeiten in der sicheren und effizienten Bedienung von Produktionsanlagen und Werkzeugen.
-- Qualitätskontrolle: Fähigkeiten zur Überwachung und Gewährleistung der Produktqualität.
-- Produktionsplanung und -steuerung: Kenntnisse über Arbeitsabläufe, Produktionsprozesse und Fähigkeit zur Planung und Organisation von Aufgaben.
-- Lean-Prinzipien: Verständnis der Lean-Methoden zur Verschlankung von Produktionsprozessen.
+2. Methodenkompetenzen:
+Methodenkompetenzen beziehen sich auf spezielle Techniken, Verfahren und Arbeitsmethoden, die in der Produktion eingesetzt werden.
 
-3. Funktionale Kompetenzen: Funktionale Kompetenzen beziehen sich auf spezifisches Fachwissen und Kenntnisse, die für bestimmte Produktionsaufgaben erforderlich sind. Dazu gehören:
-- Maschinenbedienung: Fachwissen über die Funktionsweise und Bedienung von Produktionsmaschinen.
-- Materialkenntnisse: Verständnis der Materialien, die in der Produktion verwendet werden, und deren Eigenschaften.
-- Qualitätsmanagement: Kenntnisse über Qualitätsstandards und -verfahren.
-- Technische Zeichnungen und Spezifikationen: Fähigkeit, technische Zeichnungen und Spezifikationen zu lesen und zu verstehen.
+3. Funktionale Kompetenzen:
+Funktionale Kompetenzen beziehen sich auf die Fachkenntnisse und spezifischen Qualifikationen, die für bestimmte Positionen oder Rollen in der Produktion erforderlich sind.
 
-4. Soft Skills: Soft Skills sind zwischenmenschliche Fähigkeiten und Verhaltensweisen, die die Zusammenarbeit im Team und die Produktivität fördern. Dazu gehören:
-- Problemlösungsfähigkeiten: Die Fähigkeit, Herausforderungen und Probleme in der Produktion zu identifizieren und effektive Lösungen zu finden.
-- Kommunikationsfähigkeiten: Fähigkeit zur klaren Kommunikation mit Teammitgliedern, Vorgesetzten und anderen Abteilungen.
-- Anpassungsfähigkeit: Fähigkeit, sich an sich ändernde Anforderungen und Arbeitsbedingungen anzupassen.
-- Eigenmotivation: Initiative, um die Arbeit eigenständig und effektiv zu erledigen.
-- Konfliktlösung: Fähigkeit, Konflikte konstruktiv zu lösen und zur Förderung eines harmonischen Arbeitsumfelds beizutragen.
+4. Soft Skills:
+Soft Skills sind zwischenmenschliche Fähigkeiten und soziale Kompetenzen, die Mitarbeitende benötigen, um effektiv mit Kollegen, Vorgesetzten und Kunden zu kommunizieren und zusammenzuarbeiten.
