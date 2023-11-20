@@ -1,4 +1,5 @@
-# from flask import Flask
+from flask import Flask, app, jsonify
+from flask_cors import CORS
 from langchain.prompts import PromptTemplate
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
@@ -14,11 +15,12 @@ sys.path.append(os.getcwd())
 
 from backend.chains import run_production_steps_chain, run_roles_chain, run_skills_chain
 from backend.utils import read_file, validate_steps
+from backend.routes import create_app
 
-# Create Flask app
-# app = Flask(__name__)
+app = create_app()
 
 def main():
+
     # Load environment variables
     dotenv.load_dotenv()
     openai.api_key = os.getenv("OPEN_AI_API_KEY")
@@ -54,4 +56,4 @@ def main():
     print(skills_response)
 
 if __name__ == '__main__':
-   main()
+   app.run(debug=True, port=8080)
