@@ -1,10 +1,29 @@
 import React, { useState } from 'react';
+import { Spinner } from '@chakra-ui/react'
+import StepperComponent from '../components/StepperComponent';
+import { Button, Box } from '@chakra-ui/react';
+
 
 const ProductPage = () => {
   const [inputValue, setInputValue] = useState('');
   const [apiResponse, setApiResponse] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const activeStepIndex = 1;
+
+  const [clickedSteps, setClickedSteps] = useState<number[]>([]);
+
+  const handleButtonClick = (index) => {
+    setClickedSteps(prev => {
+      const newState = [...prev];
+      if (newState.includes(index)) {
+        newState.splice(newState.indexOf(index), 1); // Remove index if already in array
+      } else {
+        newState.push(index); // Add index if not in array
+      }
+      return newState;
+    });
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -41,6 +60,10 @@ const ProductPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-10">
+        <div className="pb-20">
+            <StepperComponent activeIndex={activeStepIndex} />
+        </div>        
+
         <form onSubmit={handleSubmit} className="mb-4">
             <div className="flex flex-col">
                 <label htmlFor="productInput" className="text-4xl font-semibold mb-8">
@@ -67,25 +90,47 @@ const ProductPage = () => {
             </div>
         </form>
 
-
         {isLoading && !apiResponse && (
-        <div className="italic text-gray-500">Wizard verarbeitet die Anfrage...</div>
+            <div className="flex items-center justify-center italic text-gray-500">
+            <Spinner
+                thickness='1px'
+                speed='0.65s'
+                emptyColor='gray.200'
+                color='#0c4a6e'
+                size='sm'
+            />
+            <span className="ml-2">Wizard verarbeitet die Anfrage...</span>
+        </div>
       )}
 
-{apiResponse && (
-  <div className="mt-4 p-4 border rounded-md shadow bg-white">
-    <h2 className="font-semibold text-lg">Für dieses Produkt gibt es üblicherweise folgende Produktionsschritte:</h2>
-    <ul className="list-none list-inside">
-      {apiResponse.split('\n').map((step, index) => (
-        <li key={index}>{step}</li>
-      ))}
-    </ul>
-  </div>
+        {apiResponse && (
+        <Box className="mt-4 p-4 border rounded-md shadow bg-white" w="full" maxW="2xl">
+            <h2 className="font-semibold text-lg mb-4">Für dieses Produkt gibt es üblicherweise folgende Produktionsschritte:</h2>
+            <div className="grid grid-cols-2 gap-3">
+            {apiResponse.split('\n').map((step, index: number) => (
+                <Button
+                key={index}
+                onClick={() => handleButtonClick(index)}
+                style={{
+                    whiteSpace: 'normal',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    height: 'auto',
+                    padding: '8px',
+                    backgroundColor: clickedSteps.includes(index) ? '#0c4a6e' : '', // Change color based on click
+                    color: clickedSteps.includes(index) ? 'white' : 'black'
+                }}
+                >
+                {step}
+                </Button>
+            ))}
+            </div>
+        </Box>
       )}
 
-      {error && <div className="text-red-500">Error: {error}</div>}
-    </div>
-  )
-};
+            {error && <div className="text-red-500">Error: {error}</div>}
+            </div>
+        )
+        };
 
 export default ProductPage;
