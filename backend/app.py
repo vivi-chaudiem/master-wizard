@@ -4,11 +4,11 @@ from langchain.prompts import PromptTemplate
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
 from pathlib import Path
-import dotenv
-import os
+
 import openai
 import json
 import sys
+import os
 
 # print ls
 sys.path.append(os.getcwd())
@@ -21,14 +21,14 @@ app = create_app()
 
 def main():
 
-    # Load environment variables
-    dotenv.load_dotenv()
-    openai.api_key = os.getenv("OPEN_AI_API_KEY")
+    # # Load environment variables
+    # dotenv.load_dotenv()
+    # openai.api_key = os.getenv("OPEN_AI_API_KEY")
 
-    llm = ChatOpenAI(
-        openai_api_key=openai.api_key, 
-        model_name="gpt-3.5-turbo"
-        )
+    # llm = ChatOpenAI(
+    #     openai_api_key=openai.api_key, 
+    #     model_name="gpt-3.5-turbo"
+    #     )
     
     # 1. Ask about product
     product = input("Welches Produkt wird in dem Werk produziert? ")

@@ -8,6 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        'ring-color': '#0c4a6e'
+      },
       backgroundColor: {
         'hover-color': '#0c4a6e'
       },
