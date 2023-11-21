@@ -1,25 +1,28 @@
 import React, { useState } from 'react';
 import { Spinner } from '@chakra-ui/react'
 import StepperComponent from '../components/StepperComponent';
-import { Button, Box } from '@chakra-ui/react';
+import { Button, Box, Progress } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
+import LoaderComponent from '../components/LoaderComponent';
 
 
 const ProductPage = () => {
   const [inputValue, setInputValue] = useState('');
   const [apiResponse, setApiResponse] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const activeStepIndex = 1;
-
   const [clickedSteps, setClickedSteps] = useState<number[]>([]);
+  const activeStepIndex = 1;
+  const router = useRouter();
+  const [error, setError] = useState('');
+
 
   const handleButtonClick = (index) => {
     setClickedSteps(prev => {
       const newState = [...prev];
       if (newState.includes(index)) {
-        newState.splice(newState.indexOf(index), 1); // Remove index if already in array
+        newState.splice(newState.indexOf(index), 1);
       } else {
-        newState.push(index); // Add index if not in array
+        newState.push(index);
       }
       return newState;
     });
@@ -60,7 +63,8 @@ const ProductPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-10">
-        <div className="pb-20">
+      
+        <div className="pb-20 width: '100%'">
             <StepperComponent activeIndex={activeStepIndex} />
         </div>        
 
@@ -79,33 +83,26 @@ const ProductPage = () => {
                     placeholder="Konkreten Produktnamen eingeben"
                     required
                 />
-                <div className="flex justify-end mb-2">
-                <button
-                    type="submit"
-                    className="bg-blue-950 hover:bg-hover-color text-white font-bold py-2 px-4 rounded-md"
-                    >
-                    Bestätigen
-                </button>
-                </div>
+                {!apiResponse && (
+                  <div className="flex justify-end mb-2">
+                  <button
+                      type="submit"
+                      className="bg-blue-950 hover:bg-hover-color text-white font-bold py-2 px-4 rounded-md"
+                      >
+                      Bestätigen
+                  </button>
+                  </div>
+                )}
             </div>
         </form>
 
         {isLoading && !apiResponse && (
-            <div className="flex items-center justify-center italic text-gray-500">
-            <Spinner
-                thickness='1px'
-                speed='0.65s'
-                emptyColor='gray.200'
-                color='#0c4a6e'
-                size='sm'
-            />
-            <span className="ml-2">Wizard verarbeitet die Anfrage...</span>
-        </div>
-      )}
+            <LoaderComponent />
+        )}
 
         {apiResponse && (
         <Box className="mt-4 p-4 border rounded-md shadow bg-white" w="full" maxW="2xl">
-            <h2 className="font-semibold text-lg mb-4">Für dieses Produkt gibt es üblicherweise folgende Produktionsschritte:</h2>
+            <h2 className="font-semibold text-lg mb-4">Für dieses Produkt gibt es üblicherweise folgende Produktionsschritte:<br/><br/><i>Bitte klicke alle Schritte an, die auf dein Werk zutreffen.</i></h2>
             <div className="grid grid-cols-2 gap-3">
             {apiResponse.split('\n').map((step, index: number) => (
                 <Button
@@ -117,7 +114,7 @@ const ProductPage = () => {
                     textOverflow: 'ellipsis',
                     height: 'auto',
                     padding: '8px',
-                    backgroundColor: clickedSteps.includes(index) ? '#0c4a6e' : '', // Change color based on click
+                    backgroundColor: clickedSteps.includes(index) ? '#0c4a6e' : '',
                     color: clickedSteps.includes(index) ? 'white' : 'black'
                 }}
                 >
@@ -125,12 +122,20 @@ const ProductPage = () => {
                 </Button>
             ))}
             </div>
-        </Box>
-      )}
 
-            {error && <div className="text-red-500">Error: {error}</div>}
+            <div className="flex justify-end">
+              <button
+                onClick={() => router.push('/roles')}
+                className="bg-blue-950 hover:bg-hover-color text-white font-bold py-2 px-4 rounded-md mt-4">
+                Bestätigen
+              </button>
             </div>
+        </Box>
+        )}
+
+        {error && <div className="text-red-500">Error: {error}</div>}
+        </div>
         )
-        };
+  };
 
 export default ProductPage;

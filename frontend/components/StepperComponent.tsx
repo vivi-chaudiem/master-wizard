@@ -1,16 +1,16 @@
 // StepperComponent.js
 import React from 'react';
-import { useSteps, Stepper, Step, StepIndicator, StepStatus, StepIcon, StepNumber, StepTitle, StepDescription, StepSeparator, Box } from '@chakra-ui/react';
+import { useSteps, Stepper, Step, StepIndicator, StepStatus, StepIcon, StepNumber, StepTitle, StepDescription, StepSeparator, Box, Progress } from '@chakra-ui/react';
 
 const steps = [
-  { title: 'Willkommen', description: 'Einleitung' },
   { title: 'Produkt', description: 'Abfrage' },
-  { title: 'Weiteres', description: 'Ganz viele andere tolle Sachen' },
+  { title: 'Rollen', description: 'Validierung' },
+  { title: 'Fähigkeiten', description: 'Validierung' },
 ];
 
 const StepperComponent = ({ activeIndex }) => {
   return (
-    <Stepper size='lg' colorScheme='blue' index={activeIndex}>
+    <Stepper size='lg' colorScheme='customBlue' index={activeIndex}>
       {steps.map((step, index) => (
         <Step key={index}>
           <StepIndicator>
@@ -19,18 +19,22 @@ const StepperComponent = ({ activeIndex }) => {
               incomplete={<StepNumber />}
               active={<StepNumber />}
             />
-          </StepIndicator>
+          </StepIndicator >
 
-          <Box flexShrink='0'>
-            <StepTitle>{step.title}</StepTitle>
-            <StepDescription>{step.description}</StepDescription>
+            <Box flexShrink='1'>
+              <StepTitle>{step.title}</StepTitle>
+              <StepDescription>{step.description}</StepDescription>
+            </Box>
+
+          <Box>
+            <StepSeparator />
           </Box>
-
-          <StepSeparator />
+          
         </Step>
       ))}
     </Stepper>
   );
 };
+
 
 export default StepperComponent;
