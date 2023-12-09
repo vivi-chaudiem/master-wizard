@@ -2,3 +2,26 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+
+.answer-box {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid;
+    border-radius: 0.25rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    width: 100%;
+    max-width: 36rem;
+  }
+
+.h2-answer-box {
+font-weight: 600; 
+font-size: 1.125rem; 
+margin-bottom: 1rem; 
+}
+
+.grid-answer-box {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem; 
+  }

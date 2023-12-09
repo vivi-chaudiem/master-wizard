@@ -12,6 +12,17 @@ const customTheme = extendTheme({
       500: '#0c4a6e'
     },
   },
+  components: {
+    Button: {
+      baseStyle: {
+        whiteSpace: 'normal',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        height: 'auto',
+        padding: '8px',
+      },
+    },
+  },
 });
 
 export default customTheme;

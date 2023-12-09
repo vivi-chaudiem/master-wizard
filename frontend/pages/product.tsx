@@ -4,6 +4,7 @@ import StepperComponent from '../components/StepperComponent';
 import { Button, Box, Progress } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import LoaderComponent from '../components/LoaderComponent';
+import { toggleArrayValue } from '../utils/utils';
 
 
 const ProductPage = () => {
@@ -17,15 +18,7 @@ const ProductPage = () => {
 
 
   const handleButtonClick = (index) => {
-    setClickedSteps(prev => {
-      const newState = [...prev];
-      if (newState.includes(index)) {
-        newState.splice(newState.indexOf(index), 1);
-      } else {
-        newState.push(index);
-      }
-      return newState;
-    });
+    setClickedSteps((prev) => toggleArrayValue(prev, index));
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,31 +94,29 @@ const ProductPage = () => {
         )}
 
         {apiResponse && (
-        <Box className="mt-4 p-4 border rounded-md shadow bg-white" w="full" maxW="2xl">
-            <h2 className="font-semibold text-lg mb-4">Für dieses Produkt gibt es üblicherweise folgende Produktionsschritte:<br/><br/><i>Bitte klicke alle Schritte an, die auf dein Werk zutreffen.</i></h2>
-            <div className="grid grid-cols-2 gap-3">
+        <Box className="answer-box">
+            <h2 className="h2-answer-box">Für dieses Produkt gibt es üblicherweise folgende Produktionsschritte:<br/><br/><i>Bitte klicke alle Schritte an, die auf dein Werk zutreffen.</i></h2>
+            <div className="grid-answer-box">
             {apiResponse.split('\n').map((step, index: number) => (
                 <Button
                 key={index}
                 onClick={() => handleButtonClick(index)}
-                style={{
-                    whiteSpace: 'normal',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    height: 'auto',
-                    padding: '8px',
-                    backgroundColor: clickedSteps.includes(index) ? '#0c4a6e' : '',
-                    color: clickedSteps.includes(index) ? 'white' : 'black'
+                sx={{
+                  backgroundColor: clickedSteps.includes(index) ? '#0c4a6e' : '',
+                  color: clickedSteps.includes(index) ? 'white' : 'black',
                 }}
-                >
+              >
                 {step}
-                </Button>
+              </Button>
             ))}
             </div>
 
             <div className="flex justify-end">
               <button
-                onClick={() => router.push('/roles')}
+                onClick={() => router.push({
+                  pathname: '/roles',
+                  query: { product: inputValue, clickedSteps: JSON.stringify(clickedSteps) }
+                })}
                 className="bg-blue-950 hover:bg-hover-color text-white font-bold py-2 px-4 rounded-md mt-4">
                 Bestätigen
               </button>
@@ -134,8 +125,8 @@ const ProductPage = () => {
         )}
 
         {error && <div className="text-red-500">Error: {error}</div>}
-        </div>
-        )
+    </div>
+    )
   };
 
 export default ProductPage;

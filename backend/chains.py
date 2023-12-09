@@ -21,7 +21,7 @@ def run_production_steps_chain(llm, product):
 
 # Roles chain
 def run_roles_chain(llm, product, production_steps):
-    template = "Angenommen in der Produktion von dem Produkt {product} gibt es folgende Arbeitsschritte {production_steps}. Welche Rollen könnte es jede dieser Arbeitsschritte geben? Bitte gib eine Liste ohne zusätzliche Erklärungen aus."
+    template = "Angenommen in der Produktion von dem Produkt {product} gibt es folgende Arbeitsschritte {production_steps}. Welche Rollen könnte es jede dieser Arbeitsschritte geben? (Beispiel: Zu dem Produktionsschritt 'Montage' könnte es die Rolle 'Monteur' geben.) Bitte gib eine Liste ohne zusätzliche Erklärungen, ohne Dopplungen und ohne den dazugehörigen Produktionsschritt aus. Beginne deine Antwort direkt mit der Aufzählung (1., 2., etc.)."
 
     formatted_template = template.format(
         product=product,
