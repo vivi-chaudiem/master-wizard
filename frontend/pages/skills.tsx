@@ -5,10 +5,22 @@ import { useRouter } from 'next/router';
 import { Box, Button } from '@chakra-ui/react';
 import { toggleArrayValue } from '../utils/utils';
 
+interface Competency {
+    "Basiskompetenzen": string[];
+    "Methodenkompetenzen": string[];
+    "Funktionale Kompetenzen": string[];
+    "Soft Skills": string[];
+  }
+  
+interface Skill {
+  Arbeitsschritt: string;
+  Rolle: string;
+  Kompetenzen: Competency;
+}
 
 const SkillsPage = () => {
   const router = useRouter();
-  const [apiResponse, setApiResponse] = useState<string | null>(null);
+  const [apiResponse, setApiResponse] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [clickedSkills, setClickedSkills] = useState<number[]>([]);
   const [error, setError] = useState('');
@@ -45,22 +57,88 @@ const SkillsPage = () => {
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`);
         }
-    
-        const data = await response.json();
+
+        // const data = await response.text(); // Read response as text
         // console.log(data);
-        // const steps = data.split('\n');
+
+        // // // Wrap data in square brackets and replace separating commas
+        // // const formattedData = `[${data.trim()}]`;
+
+        // // Parse the formatted data
+        // const parsedData = JSON.parse(data);
+        // console.log(parsedData);
+
+        const data = await response.json();
+        console.log('API Data:', data); // Check the structure of the API data
         setApiResponse(data);
+
       } catch (err: unknown) {
         if (err instanceof Error) {
             setError(err.message);
           } else {
             setError('Unbekannter Fehler!');
           }
+        } finally {
+          setIsLoading(false); // Ensure isLoading is set to false in both success and error scenarios
+        }
+
     }
-    };
 
     fetchData();
   }, [router.query]);
+
+  const renderCompetencies = (competencies: Competency) => {
+    return (
+      <div>
+        {Object.entries(competencies).map(([category, skills], index) => (
+          <div key={index}>
+            <h4>{category}</h4>
+            <ul>
+              {skills.map((skill, skillIndex) => (
+                <li key={skillIndex}>{skill}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    );
+  };
+  
+
+  const renderSkills = () => {
+    console.log('Render API Response:', apiResponse); // Debugging
+    const skillsArray = Array.isArray(apiResponse) ? apiResponse : [apiResponse];
+
+    if (isLoading) {
+      return <LoaderComponent />;
+    }
+  
+    if (error) {
+      return <div className="text-red-500">Error: {error}</div>;
+    }
+  
+    if (!Array.isArray(apiResponse)) {
+      console.error('apiResponse is not an array:', apiResponse);
+      return <div>Error: Response data is not in the expected format.</div>;
+    }
+  
+    if (apiResponse.length === 0) {
+      return <div>No data available.</div>;
+    }
+  
+    return (
+      <div>
+        {skillsArray.map((skill, index) => (
+          <div key={index} style={{ marginBottom: '20px' }}>
+            <h3>Arbeitsschritt: {skill.Arbeitsschritt}</h3>
+            <p>Rolle: {skill.Rolle}</p>
+            <h4>Kompetenzen:</h4>
+            {renderCompetencies(skill.Kompetenzen)}
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-10">
@@ -72,89 +150,23 @@ const SkillsPage = () => {
               <LoaderComponent />
           )}
 
+
       {apiResponse && (
       <Box className="answer-box">
           <h2 className="h2-answer-box">Für diese Rollen gibt es üblicherweise folgende Fähigkeiten:<br/><br/></h2>
-
-        <div>
+          {renderSkills()}
+        {/* <div>
             {apiResponse.split('\n').map((step, index: number) => (
             <p key={index}>{step}</p>
             ))}
-        </div>
-{/* 
-        {apiResponse.split('\n').map((item, index) => (
-            <div key={index} className="item-box">
-                <div className="role">Rolle: {item.Rolle}</div>
-                <div className="step">Arbeitsschritt: {item.Arbeitsschritt}</div>
-                
-                <div className="competencies">
-                    <div className="competency-title">Basiskompetenzen:</div>
-                    <ul>
-                        {item.Kompetenzen.Basiskompetenzen.map((skill, skillIndex) => (
-                            <li key={skillIndex}>{skill}</li>
-                        ))}
-                    </ul>
-
-                    <div className="competency-title">Methodenkompetenzen:</div>
-                    <ul>
-                        {item.Kompetenzen.Methodenkompetenzen.map((skill, skillIndex) => (
-                            <li key={skillIndex}>{skill}</li>
-                        ))}
-                    </ul>
-
-                    <div className="competency-title">Funktionale Kompetenzen:</div>
-                    <ul>
-                        {item.Kompetenzen['Funktionale Kompetenzen'].map((skill, skillIndex) => (
-                            <li key={skillIndex}>{skill}</li>
-                        ))}
-                    </ul>
-
-                    <div className="competency-title">Soft Skills:</div>
-                    <ul>
-                        {item.Kompetenzen['Soft Skills'].map((skill, skillIndex) => (
-                            <li key={skillIndex}>{skill}</li>
-                        ))}
-                    </ul>
-                </div>
-            </div>
-        ))} */}
-
-
-          {/* <div className="grid-answer-box">
-          {apiResponse.split('\n').map((step, index: number) => (
-              <Button
-              key={index}
-              onClick={() => handleButtonClick(index)}
-              sx={{
-                backgroundColor: clickedSkills.includes(index) ? '#0c4a6e' : '',
-                color: clickedSkills.includes(index) ? 'white' : 'black',
-              }}
-            >
-              {step}
-            </Button>
-          ))}
-          </div> */}
-
-          {/* <div className="flex justify-end">
-            <button
-              onClick={() => router.push({
-                pathname: '/skills',
-                query: { 
-                  product: router.query.product,
-                  production_steps: router.query.clickedSteps, 
-                  roles: JSON.stringify(clickedSkills) }
-              })}
-              className="bg-blue-950 hover:bg-hover-color text-white font-bold py-2 px-4 rounded-md mt-4">
-              Bestätigen
-            </button>
-          </div> */}
-      </Box>
-      )}
-
+        </div> */}
+        
       {error && <div className="text-red-500">Error: {error}</div>}
+      </Box>
   
-    </div>
-  );
+        )}
+     </div>
+    );
 };
 
 export default SkillsPage;

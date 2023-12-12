@@ -115,7 +115,14 @@ const ProductPage = () => {
               <button
                 onClick={() => router.push({
                   pathname: '/roles',
-                  query: { product: inputValue, clickedSteps: JSON.stringify(clickedSteps) }
+                  query: {
+                    product: inputValue,
+                    clickedSteps: JSON.stringify(
+                      clickedSteps.map((index) => {
+                        const stepText = apiResponse.split('\n')[index];
+                        return stepText.replace(/^\d+\.\s*/, '').trim();
+                    })),
+                  },
                 })}
                 className="bg-blue-950 hover:bg-hover-color text-white font-bold py-2 px-4 rounded-md mt-4">
                 Bestätigen

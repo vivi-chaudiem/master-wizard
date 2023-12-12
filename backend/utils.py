@@ -1,6 +1,16 @@
+import json
+
 def read_file(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            return json.load(file)
+    except json.JSONDecodeError as e:
+        print(f"Invalid JSON: {e}")
+        return None
+    
+def read_json(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
-        return file.read()
+        return json.load(file)
     
 def validate_steps(steps, name):
     steps_list = steps.split('\n')

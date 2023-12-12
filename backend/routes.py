@@ -5,8 +5,10 @@ from langchain.chat_models import ChatOpenAI
 import dotenv
 import os
 import openai
+import json
+import pandas as pd
 
-from backend.utils import read_file
+from backend.utils import read_file, read_json
 
 def create_app():
     app = Flask(__name__)
@@ -38,7 +40,12 @@ def create_app():
     
     @app.route('/api/get-skills', methods=['POST'])
     def run_skills():
-        data = request.json
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'error': 'No JSON data provided'}), 400
+
+        # Extract data from the JSON object
         product = data.get('product')
         production_steps = data.get('production_steps')
         roles = data.get('roles')
@@ -48,10 +55,16 @@ def create_app():
         background_info = read_file(background_info_path)
 
         # Load the JSON-style template as a raw string
-        json_template_path = "backend/documents/skills_json_description.txt"
-        json_template = read_file(json_template_path)
+        json_template_path = "backend/documents/skills_json_description.json"
+        json_template = read_json(json_template_path)
+
+        if isinstance(json_template, dict):
+            print("json_template is a valid dictionary")
+        else:
+            print("json_template is not a dictionary")
 
         result = run_skills_chain(llm, product, roles, production_steps, background_info, json_template)
+        print(result)
         return jsonify(result)
 
     return app

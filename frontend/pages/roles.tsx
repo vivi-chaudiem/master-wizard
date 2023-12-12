@@ -120,8 +120,14 @@ const RolesPage = () => {
                 query: { 
                   product: router.query.product,
                   production_steps: router.query.clickedSteps, 
-                  roles: JSON.stringify(clickedRoles) }
-              })}
+                  roles: JSON.stringify(
+                    clickedRoles.map((index) => {
+                    const stepText = apiResponse.split('\n')[index];
+                    return stepText.replace(/^\d+\.\s*/, '').trim();
+                  }))
+              }
+            })}
+
               className="bg-blue-950 hover:bg-hover-color text-white font-bold py-2 px-4 rounded-md mt-4">
               Bestätigen
             </button>
