@@ -2,17 +2,17 @@ import React, { useEffect, useState } from 'react';
 import StepperComponent from '../components/StepperComponent';
 import LoaderComponent from '../components/LoaderComponent';
 import { useRouter } from 'next/router';
-import { Box, Button } from '@chakra-ui/react';
+import { Box, Button, ListItem, UnorderedList } from '@chakra-ui/react';
 import { toggleArrayValue } from '../utils/utils';
 
 interface Competency {
-    "Basiskompetenzen": string[];
-    "Methodenkompetenzen": string[];
+    Basiskompetenzen: string[];
+    Methodenkompetenzen: string[];
     "Funktionale Kompetenzen": string[];
     "Soft Skills": string[];
   }
   
-interface Skill {
+interface ApiResponse {
   Arbeitsschritt: string;
   Rolle: string;
   Kompetenzen: Competency;
@@ -20,7 +20,7 @@ interface Skill {
 
 const SkillsPage = () => {
   const router = useRouter();
-  const [apiResponse, setApiResponse] = useState<any | null>(null);
+  const [apiResponse, setApiResponse] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [clickedSkills, setClickedSkills] = useState<number[]>([]);
   const [error, setError] = useState('');
@@ -52,25 +52,30 @@ const SkillsPage = () => {
             production_steps: production_steps,
             roles: roles,
           }),
+        }).then(function(response) {
+          return response.json();
+        }).then(function(data) {
+            setApiResponse(data);
+        }).catch( err =>  {
+            console.log(err);
         });
+      
+        // if (!response.ok) {
+        //   throw new Error(`Error: ${response.status}`);
+        // }
+
+        // const data = await response.json();
     
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
-
-        // const data = await response.text(); // Read response as text
-        // console.log(data);
-
-        // // // Wrap data in square brackets and replace separating commas
-        // // const formattedData = `[${data.trim()}]`;
-
-        // // Parse the formatted data
-        // const parsedData = JSON.parse(data);
-        // console.log(parsedData);
-
-        const data = await response.json();
-        console.log('API Data:', data); // Check the structure of the API data
-        setApiResponse(data);
+        // const indexOfBracket = data.indexOf('[');
+        // if (indexOfBracket !== -1) {
+        //   const trimmedData = data.substring(indexOfBracket);
+        //   data = trimmedData;
+        //   console.log('Data after trimming: ', data);
+        // } else {
+        //   console.log('No "[" character found in the text.');
+        // }
+        
+        // setApiResponse(data);
 
       } catch (err: unknown) {
         if (err instanceof Error) {
@@ -78,36 +83,25 @@ const SkillsPage = () => {
           } else {
             setError('Unbekannter Fehler!');
           }
-        } finally {
-          setIsLoading(false); // Ensure isLoading is set to false in both success and error scenarios
-        }
+      } finally {
+        setIsLoading(false);
+      }
 
     }
 
     fetchData();
   }, [router.query]);
-
-  const renderCompetencies = (competencies: Competency) => {
-    return (
-      <div>
-        {Object.entries(competencies).map(([category, skills], index) => (
-          <div key={index}>
-            <h4>{category}</h4>
-            <ul>
-              {skills.map((skill, skillIndex) => (
-                <li key={skillIndex}>{skill}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    );
-  };
   
+  function isObject(input: any): boolean {
+    return typeof input === 'object' && input !== null;
+  }
+
+  function isString(input: any): boolean {
+    return typeof input === 'string';
+  }
 
   const renderSkills = () => {
-    console.log('Render API Response:', apiResponse); // Debugging
-    const skillsArray = Array.isArray(apiResponse) ? apiResponse : [apiResponse];
+    let roleNumber = 1;
 
     if (isLoading) {
       return <LoaderComponent />;
@@ -116,27 +110,37 @@ const SkillsPage = () => {
     if (error) {
       return <div className="text-red-500">Error: {error}</div>;
     }
-  
-    if (!Array.isArray(apiResponse)) {
-      console.error('apiResponse is not an array:', apiResponse);
-      return <div>Error: Response data is not in the expected format.</div>;
-    }
-  
-    if (apiResponse.length === 0) {
-      return <div>No data available.</div>;
-    }
-  
+
+    console.log(apiResponse);
+
+    let apiResponseObj: ApiResponse[] = JSON.parse(apiResponse);
+    console.log('Arbeitsschritt: ', apiResponseObj[0].Arbeitsschritt);
+
     return (
+
       <div>
-        {skillsArray.map((skill, index) => (
-          <div key={index} style={{ marginBottom: '20px' }}>
-            <h3>Arbeitsschritt: {skill.Arbeitsschritt}</h3>
-            <p>Rolle: {skill.Rolle}</p>
-            <h4>Kompetenzen:</h4>
-            {renderCompetencies(skill.Kompetenzen)}
+        {apiResponse && apiResponseObj.map((item, index) => (
+          <div key={index}>
+            <h3 className="h3-skill-title">{roleNumber++}. Rolle: {item.Rolle}</h3>
+            <UnorderedList>
+              <ListItem><b>Arbeitsschritt: </b>{item.Arbeitsschritt}</ListItem>
+              <ListItem><b>Kompetenzen:</b></ListItem>
+            </UnorderedList>
+            <div className="competency-container">
+              {Object.entries(item.Kompetenzen).map(([category, skills], categoryIndex) => (
+                <div key={categoryIndex} className="category-container">
+                  <UnorderedList ml={10}>
+                    <ListItem className="competency-category">{category}:</ListItem>
+                    {(skills as string[]).map((skill, skillIndex) => (
+                      <ListItem ml={10} key={skillIndex}>{skill}</ListItem>
+                    ))}
+                  </UnorderedList>
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
+     ))}
+</div>
     );
   };
 
@@ -155,12 +159,7 @@ const SkillsPage = () => {
       <Box className="answer-box">
           <h2 className="h2-answer-box">Für diese Rollen gibt es üblicherweise folgende Fähigkeiten:<br/><br/></h2>
           {renderSkills()}
-        {/* <div>
-            {apiResponse.split('\n').map((step, index: number) => (
-            <p key={index}>{step}</p>
-            ))}
-        </div> */}
-        
+  
       {error && <div className="text-red-500">Error: {error}</div>}
       </Box>
   
