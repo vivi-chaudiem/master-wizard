@@ -10,10 +10,8 @@ import pandas as pd
 
 from backend.utils import read_file, read_json
 
-def create_app():
-    app = Flask(__name__)
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
-
+def init_routes(app):
+    
     # Load environment variables
     dotenv.load_dotenv()
     openai.api_key = os.getenv("OPEN_AI_API_KEY")

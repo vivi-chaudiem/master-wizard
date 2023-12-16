@@ -1,59 +1,45 @@
-from flask import Flask, app, jsonify
+from flask import Flask, app
 from flask_cors import CORS
-from langchain.prompts import PromptTemplate
-from langchain.chat_models import ChatOpenAI
-from langchain.chains import LLMChain
-from pathlib import Path
+from flask_sqlalchemy import SQLAlchemy
 
-import openai
-import json
 import sys
 import os
 
 # print ls
 sys.path.append(os.getcwd())
 
-from backend.chains import run_production_steps_chain, run_roles_chain, run_skills_chain
-from backend.utils import read_file, validate_steps
-from backend.routes import create_app
+from backend.routes import init_routes
+from backend.dbextensions import db
+from backend import dbmodels
+
+def create_app():
+    app = Flask(__name__)
+
+    # Set up database
+    basedir = os.path.abspath(os.path.dirname(__file__))
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'wizard-database.db')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    # Initialize app with database and create all tables
+    db.init_app(app)
+
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+
+    # Print the database path
+    print("Database Path:", basedir)
+
+    # Set up CORS
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+    # Initialize routes
+    init_routes(app)
+
+    return app
 
 app = create_app()
 
-def main():
-    app.run(debug=True, port=8080)
-    # # Load environment variables
-    # dotenv.load_dotenv()
-    # openai.api_key = os.getenv("OPEN_AI_API_KEY")
-
-    # llm = ChatOpenAI(
-    #     openai_api_key=openai.api_key, 
-    #     model_name="gpt-3.5-turbo"
-    #     )
-    
-    # # 1. Ask about product
-    # product = input("Welches Produkt wird in dem Werk produziert? ")
-
-    # # 2. Production steps
-    # production_steps_response = run_production_steps_chain(llm, product)
-    # validated_production_steps = validate_steps(production_steps_response, "Produktionsschritte")
-
-    # # 3. Roles
-    # roles_response = run_roles_chain(llm, product, validated_production_steps)
-    # validated_roles = validate_steps(roles_response, "Rollen")
-
-    # # 4. Skills
-    # # Load background information
-    # background_info_path = "backend/documents/background_info.txt"
-    # background_info = read_file(background_info_path)
-
-    # # Load the JSON-style template as a raw string
-    # skills_json_template_path = "backend/documents/skills_json_description.txt"
-    # skills_json_template = read_file(skills_json_template_path)
-
-    # skills_response = run_skills_chain(llm, product, validated_roles, validated_production_steps, background_info, skills_json_template)
-    # validate_steps(skills_response, "Fähigkeiten")
-
-    # print(skills_response)
-
 if __name__ == '__main__':
-    main()
+    app.run(debug=True, port=8080)
