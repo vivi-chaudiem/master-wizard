@@ -9,21 +9,23 @@ import os
 sys.path.append(os.getcwd())
 
 from backend.routes import init_routes
+from backend.dbextensions import db
+from backend import dbmodels
 
 def create_app():
-    basedir = os.path.abspath(os.path.dirname(__file__))
-
     app = Flask(__name__)
 
     # Set up database
-    app.config['SQLALCHEMY_DATABASE_URI'] =\
-        'sqlite:///' + os.path.join(basedir, 'wizard-database.db')
+    basedir = os.path.abspath(os.path.dirname(__file__))
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'wizard-database.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    # Initialize database and create tables
-    db = SQLAlchemy(app)
+    # Initialize app with database and create all tables
+    db.init_app(app)
 
     with app.app_context():
+        db.drop_all()
         db.create_all()
 
     # Print the database path
