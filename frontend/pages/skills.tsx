@@ -163,7 +163,7 @@ const SkillsPage = () => {
         }
 
         console.log('Save successful:', result);
-        alert("Speichern erfolgreich!");
+        router.push('/success');
 
       } catch (error: unknown) {
       if (error instanceof Error) {

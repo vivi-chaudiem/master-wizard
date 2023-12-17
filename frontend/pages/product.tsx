@@ -12,6 +12,7 @@ const ProductPage = () => {
   const [apiResponse, setApiResponse] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [clickedSteps, setClickedSteps] = useState<number[]>([]);
+  const [additionalStep, setAdditionalStep] = useState('');
   const activeStepIndex = 1;
   const router = useRouter();
   const [error, setError] = useState('');
@@ -53,6 +54,39 @@ const ProductPage = () => {
           }
     }
   };
+
+  const handleAdditionalStepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAdditionalStep(e.target.value);
+  };
+
+  const handleConfirmClick = () => {
+    if (apiResponse) {
+      // Get the text of the clicked steps
+      const selectedSteps = clickedSteps.map((index) => {
+          const stepText = apiResponse.split('\n')[index];
+          return stepText.replace(/^\d+\.\s*/, '').trim();
+      });
+
+      // Add the additional step if it's not empty
+      if (additionalStep.trim() !== '') {
+          selectedSteps.push(additionalStep.trim());
+      }
+
+      // Navigate to the /roles page with the combined steps
+      router.push({
+          pathname: '/roles',
+          query: {
+              product: inputValue,
+              clickedSteps: JSON.stringify(selectedSteps),
+          },
+      });
+  } else {
+      // Handle the case when apiResponse is null
+      console.error('apiResponse is null');
+      // You can set an error message or take other appropriate actions here
+  }
+};
+
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-10">
@@ -111,23 +145,29 @@ const ProductPage = () => {
             ))}
             </div>
 
-            <div className="flex justify-end">
-              <button
-                onClick={() => router.push({
-                  pathname: '/roles',
-                  query: {
-                    product: inputValue,
-                    clickedSteps: JSON.stringify(
-                      clickedSteps.map((index) => {
-                        const stepText = apiResponse.split('\n')[index];
-                        return stepText.replace(/^\d+\.\s*/, '').trim();
-                    })),
-                  },
-                })}
-                className="bg-blue-950 hover:bg-hover-color text-white font-bold py-2 px-4 rounded-md mt-4">
-                Bestätigen
-              </button>
+            <div className="mt-4">
+              <label htmlFor="additionalStep" className="text-xl font-semibold">
+                Weitere Produktionsschritte:
+              </label><br></br>
+              <input
+                type="text"
+                id="additionalStep"
+                name="additionalStep"
+                value={additionalStep}
+                onChange={handleAdditionalStepChange}
+                className="bg-white border border-gray-200 text-gray-900 text-lg rounded-md focus:ring-2 focus:ring-ring-color focus:ring-offset-0 focus:border-ring-color focus:outline-none shadow-sm p-3 mb-2"
+                placeholder="Weitere Schritte hinzufügen"
+              />
             </div>
+
+            <div className="flex justify-end">
+                <button
+                    onClick={handleConfirmClick}
+                    className="bg-blue-950 hover:bg-hover-color text-white font-bold py-2 px-4 rounded-md mt-4">
+                    Bestätigen
+                </button>
+            </div>
+            
         </Box>
         )}
 
