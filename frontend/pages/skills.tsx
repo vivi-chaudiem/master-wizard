@@ -139,10 +139,46 @@ const SkillsPage = () => {
               ))}
             </div>
           </div>
-     ))}
-</div>
+        ))}
+      </div>
     );
   };
+
+  const handleSave = async () => {
+    setIsLoading(true);
+    try {
+        let apiResponseObj: ApiResponse[] = JSON.parse(apiResponse);
+
+        const response = await fetch('http://127.0.0.1:8080/api/save-competencies', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(apiResponseObj)
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.message || `Error: ${response.status}`);
+        }
+
+        console.log('Save successful:', result);
+        alert("Speichern erfolgreich!");
+
+      } catch (error: unknown) {
+      if (error instanceof Error) {
+          console.error('Error saving competencies:', error);
+          setError(error.message || 'Unbekannter Fehler beim Speichern!');
+          alert(error.message || 'Fehler beim Speichern!');
+      } else {
+          // Handle cases where the error is not an Error object
+          console.error('An unexpected error occurred:', error);
+          setError('Unbekannter Fehler beim Speichern!');
+          alert('Unbekannter Fehler beim Speichern!');
+      }
+    }
+  };
+
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-10">
@@ -161,10 +197,13 @@ const SkillsPage = () => {
           {renderSkills()}
   
       {error && <div className="text-red-500">Error: {error}</div>}
+      <div className="flex justify-end">
+        <Button onClick={handleSave}>Speichern</Button>
+      </div>
       </Box>
   
         )}
-     </div>
+    </div>
     );
 };
 

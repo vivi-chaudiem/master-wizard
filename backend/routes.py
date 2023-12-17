@@ -73,36 +73,39 @@ def init_routes(app):
 
         try:
             data = request.get_json()
+            print(data)
 
             for item in data:
                 arbeitsschritt = item.get("Arbeitsschritt")
                 rolle = item.get("Rolle")
 
                 # Create an instance of YourModel and save the data
-                new_data = Role(
-                    Arbeitsschritt=arbeitsschritt,
-                    Rolle=rolle,
+                new_role = Role(
+                    arbeitsschritt=arbeitsschritt,
+                    bezeichnung=rolle,
                 )
+                db.session.add(new_role)
+                db.session.flush()
 
-                kompetenzen = item.get("Kompetenzen", {})
-
-                basiskompetenzen = ", ".join(kompetenzen.get("Basiskompetenzen", []))
-                methodenkompetenzen = ", ".join(kompetenzen.get("Methodenkompetenzen", []))
-                funktionalekompetenzen = ", ".join(kompetenzen.get("Funktionale Kompetenzen", []))
-                softskills = ", ".join(kompetenzen.get("Soft Skills", []))
-
-                # Add the instance to the SQLAlchemy session and commit the transaction
-                db.session.add(new_data)
+                for kompetenz_typ, kompetenzen in item.get("Kompetenzen", {}).items():
+                    for bezeichnung in kompetenzen:
+                        new_competency = Competency(
+                            kompetenz_typ=kompetenz_typ,
+                            bezeichnung=bezeichnung,
+                            rolle_id=new_role.id
+                        )
+                        db.session.add(new_competency)
             
-                db.session.commit()
-
-                # Return a response indicating success
-                return jsonify({"message": "JSON data processed and mapped to the database successfully"})
+            db.session.commit()
+            return jsonify({"message": "Daten erfolgreich gespeichert."}), 201
+            
+        except KeyError as e:
+            return jsonify({"Fehler": f"Fehlende Daten: {str(e)}"}), 400
 
         except Exception as e:
             # Handle any errors that may occur during processing
-            return jsonify({"error": str(e)}), 500
+            print(f"An error occurred: {e}")  # Log the error for debugging
+            return jsonify({"Fehler": str(e)}), 500
 
-        
-
+    
     return app
