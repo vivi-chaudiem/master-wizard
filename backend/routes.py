@@ -9,6 +9,8 @@ import json
 import pandas as pd
 
 from backend.utils import read_file, read_json
+from backend.dbextensions import db
+from backend.dbmodels import Role, Competency
 
 def init_routes(app):
     
@@ -64,5 +66,43 @@ def init_routes(app):
         result = run_skills_chain(llm, product, roles, production_steps, background_info, json_template)
         print(result)
         return jsonify(result)
+    
+    # Save competencies to database
+    @app.route('/api/save-competencies', methods=['POST'])
+    def save_competencies():
+
+        try:
+            data = request.get_json()
+
+            for item in data:
+                arbeitsschritt = item.get("Arbeitsschritt")
+                rolle = item.get("Rolle")
+
+                # Create an instance of YourModel and save the data
+                new_data = Role(
+                    Arbeitsschritt=arbeitsschritt,
+                    Rolle=rolle,
+                )
+
+                kompetenzen = item.get("Kompetenzen", {})
+
+                basiskompetenzen = ", ".join(kompetenzen.get("Basiskompetenzen", []))
+                methodenkompetenzen = ", ".join(kompetenzen.get("Methodenkompetenzen", []))
+                funktionalekompetenzen = ", ".join(kompetenzen.get("Funktionale Kompetenzen", []))
+                softskills = ", ".join(kompetenzen.get("Soft Skills", []))
+
+                # Add the instance to the SQLAlchemy session and commit the transaction
+                db.session.add(new_data)
+            
+                db.session.commit()
+
+                # Return a response indicating success
+                return jsonify({"message": "JSON data processed and mapped to the database successfully"})
+
+        except Exception as e:
+            # Handle any errors that may occur during processing
+            return jsonify({"error": str(e)}), 500
+
+        
 
     return app

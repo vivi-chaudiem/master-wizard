@@ -40,4 +40,3 @@ def validate_steps(steps, name):
 
         elif user_choice == '4':
             break
-

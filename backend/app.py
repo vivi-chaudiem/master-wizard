@@ -24,9 +24,14 @@ def create_app():
     # Initialize app with database and create all tables
     db.init_app(app)
 
+    # Debug
     with app.app_context():
-        db.drop_all()
-        db.create_all()
+        try:
+            db.drop_all()
+            db.create_all()
+            print("Tables dropped and created successfully.")
+        except Exception as e:
+            print(f"Error occurred: {e}")
 
     # Print the database path
     print("Database Path:", basedir)
