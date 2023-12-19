@@ -3,20 +3,20 @@
   "Arbeitsschritt": "Arbeitsschritt 1 hier einfügen",
   "Rolle": "Rolle 1 hier einfügen",
   "Kompetenzen": {
-    "Basiskompetenzen": ["Kompetenz 1.1", "Kompetenz 1.2"],
-    "Methodenkompetenzen": ["Kompetenz 1.3", "Kompetenz 1.4"],
-    "Funktionale Kompetenzen": ["Kompetenz 1.5", "Kompetenz 1.6"],
-    "Soft Skills": ["Soft Skill 1.1", "Soft Skill 1.2"]
+    "Basiskompetenzen": ["Auflistung von Basiskompetenzen hier einfügen"],
+    "Methodenkompetenzen": ["Auflistung von Methodenkompetenzen hier einfügen"],
+    "Funktionale Kompetenzen": ["Auflistung von Funktionalen Kompetenzen hier einfügen"],
+    "Soft Skills": ["Auflistung von Soft Skills hier einfügen"]
     }
   },
   {
     "Arbeitsschritt": "Arbeitsschritt 2 hier einfügen",
     "Rolle": "Rolle 2 hier einfügen",
     "Kompetenzen": {
-      "Basiskompetenzen": ["Kompetenz 1.1", "Kompetenz 1.2"],
-      "Methodenkompetenzen": ["Kompetenz 1.3", "Kompetenz 1.4"],
-      "Funktionale Kompetenzen": ["Kompetenz 1.5", "Kompetenz 1.6"],
-      "Soft Skills": ["Soft Skill 1.1", "Soft Skill 1.2"]
+      "Basiskompetenzen": ["Auflistung von Basiskompetenzen hier einfügen"],
+      "Methodenkompetenzen": ["Auflistung von Methodenkompetenzen hier einfügen"],
+      "Funktionale Kompetenzen": ["Auflistung von Funktionalen Kompetenzen hier einfügen"],
+      "Soft Skills": ["Auflistung von Soft Skills hier einfügen"]
     }
   }
 ]

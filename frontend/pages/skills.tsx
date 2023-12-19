@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import StepperComponent from '../components/StepperComponent';
 import LoaderComponent from '../components/LoaderComponent';
 import { useRouter } from 'next/router';
-import { Box, Button, ListItem, UnorderedList } from '@chakra-ui/react';
+import { Box, Button, ListItem, UnorderedList, Checkbox, Stack } from '@chakra-ui/react';
 import { toggleArrayValue } from '../utils/utils';
 
 interface Competency {
@@ -55,6 +55,7 @@ const SkillsPage = () => {
         }).then(function(response) {
           return response.json();
         }).then(function(data) {
+            console.log(data);
             setApiResponse(data);
         }).catch( err =>  {
             console.log(err);
@@ -129,12 +130,20 @@ const SkillsPage = () => {
             <div className="competency-container">
               {Object.entries(item.Kompetenzen).map(([category, skills], categoryIndex) => (
                 <div key={categoryIndex} className="category-container">
-                  <UnorderedList ml={10}>
+                  {/* <UnorderedList ml={10}>
                     <ListItem className="competency-category">{category}:</ListItem>
                     {(skills as string[]).map((skill, skillIndex) => (
                       <ListItem ml={10} key={skillIndex}>{skill}</ListItem>
                     ))}
-                  </UnorderedList>
+                  </UnorderedList> */}
+                    <UnorderedList ml={10}>
+                      <ListItem className="competency-category">{category}:</ListItem>
+                    </UnorderedList>
+                    {(skills as string[]).map((skill, skillIndex) => (
+                      <Stack spacing={[1, 5]} direction={['column', 'row']}>
+                        <Checkbox ml={10} key={skillIndex}>{skill}</Checkbox>
+                      </Stack>
+                    ))}
                 </div>
               ))}
             </div>

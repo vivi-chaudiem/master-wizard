@@ -21,7 +21,7 @@ def run_production_steps_chain(llm, product):
 
 # Roles chain
 def run_roles_chain(llm, product, production_steps):
-    template = "Angenommen in der Produktion von dem Produkt {product} gibt es folgende Arbeitsschritte {production_steps}. Welche Rollen könnte es für jede dieser Arbeitsschritte geben? (Beispiel: Zu dem Produktionsschritt 'Montage' könnte es die Rolle 'Monteur' geben.) Ein Arbeitsschritt kann auch mehrere Rollen enthalten. Bitte gib eine einfache Liste mit den Rollen ohne zusätzliche Erklärungen, ohne Dopplungen und ohne den dazugehörigen Produktionsschritt aus. Beginne deine Antwort direkt mit der Aufzählung (1., 2., etc.), also zum Beispiel '1. Monteur'."
+    template = "Angenommen in der Produktion von dem Produkt {product} gibt es folgende Arbeitsschritte {production_steps}. Welche Rollen könnte es für jede dieser Arbeitsschritte geben? (Beispiel: Zu dem Produktionsschritt 'Montage' könnte es die Rolle 'Monteur' geben.) Ein Arbeitsschritt kann auch mehrere Rollen enthalten. Bitte gib eine einfache Liste mit den Rollen ohne zusätzliche Erklärungen, ohne Dopplungen und ohne den dazugehörigen Produktionsschritt aus. Beginne deine Antwort direkt mit der Aufzählung (1., 2., etc.), also zum Beispiel '1. Monteur' und auf KEINEN Fall in der Form '1. Montage: - Monteur'."
 
     formatted_template = template.format(
         product=product,
@@ -44,7 +44,7 @@ def run_skills_chain(llm, product, roles, production_steps, background_info, jso
     escaped_json_string = json_string.replace("{", "{{").replace("}", "}}")
 
 
-    template = "Angenommen in der Produktion von dem Produkt {product} gibt es folgende Rollen: {roles} und die zu folgenden Arbeitsschritten gehören: {production_steps}. Außerdem gibt es folgende Kompetenzkategorien mit folgenden Definitionen: {background_info}. Bitte gib mir für jede dieser Rollen eine Liste an Fähigkeiten aus, die in den vorgegeben Kompetenzkategorien eingeordnet sind. Trenne die jeweiligen Abschnitte mit einem Komma und achte darauf, dass deine gesamte Antwort am Ende eine korrekte JSON-Struktur aufweisen muss. Bitte gib mir deine Antwort als JSON zurück und strukturiere die Antwort gemäß der folgenden Vorlage:\n"
+    template = "Angenommen in der Produktion von dem Produkt {product} gibt es folgende Rollen: {roles} und die zu folgenden Arbeitsschritten gehören: {production_steps}. Außerdem gibt es folgende Kompetenzkategorien mit folgenden Definitionen: {background_info}. Bitte gib mir für jede dieser Rollen eine Liste an Fähigkeiten aus, die in den vorgegeben Kompetenzkategorien eingeordnet sind. Trenne die jeweiligen Abschnitte mit einem Komma und achte darauf, dass deine gesamte Antwort am Ende eine korrekte JSON-Struktur aufweisen muss. Bitte gib mir deine Antwort direkt als JSON zurück (ohne einleitende Worte) und strukturiere die Antwort gemäß der folgenden Vorlage:\n"
 
     formatted_template = template.format(
         product=product,
