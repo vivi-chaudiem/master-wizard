@@ -81,9 +81,7 @@ const ProductPage = () => {
           },
       });
   } else {
-      // Handle the case when apiResponse is null
       console.error('apiResponse is null');
-      // You can set an error message or take other appropriate actions here
   }
 };
 
@@ -145,9 +143,9 @@ const ProductPage = () => {
             ))}
             </div>
 
-            <div className="mt-4">
+            <div className="mt-10">
               <label htmlFor="additionalStep" className="text-xl font-semibold">
-                Weitere Produktionsschritte:
+                Weitere Produktionsschritte (optional):
               </label><br></br>
               <input
                 type="text"
@@ -155,7 +153,7 @@ const ProductPage = () => {
                 name="additionalStep"
                 value={additionalStep}
                 onChange={handleAdditionalStepChange}
-                className="bg-white border border-gray-200 text-gray-900 text-lg rounded-md focus:ring-2 focus:ring-ring-color focus:ring-offset-0 focus:border-ring-color focus:outline-none shadow-sm p-3 mb-2"
+                className="free-text-field mt-4 w-full resize-y"
                 placeholder="Weitere Schritte hinzufügen"
               />
             </div>

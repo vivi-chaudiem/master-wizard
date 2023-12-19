@@ -6,6 +6,7 @@ const steps = [
   { title: 'Produkt', description: 'Abfrage' },
   { title: 'Rollen', description: 'Validierung' },
   { title: 'Fähigkeiten', description: 'Validierung' },
+  { title: 'Fertig!', description: 'Datenspeicherung' },
 ];
 
 const StepperComponent = ({ activeIndex }) => {

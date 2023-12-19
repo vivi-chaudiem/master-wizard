@@ -35,3 +35,15 @@ margin-bottom: 1rem;
 .competency-category {
   font-weight: 600;
 }
+
+.free-text-field {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #1a202c;
+  font-size: 1.125rem;
+  border-radius: 0.375rem;
+  outline: none;
+  padding: 0.75rem; 
+  margin-bottom: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
