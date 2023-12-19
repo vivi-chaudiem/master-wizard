@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import StepperComponent from '../components/StepperComponent';
 import LoaderComponent from '../components/LoaderComponent';
 import { useRouter } from 'next/router';
 import { Box, Button, ListItem, UnorderedList, Checkbox, Stack } from '@chakra-ui/react';
 import { toggleArrayValue } from '../utils/utils';
+import { SkillsContext } from 'context/skillscontext';
 
 interface Competency {
     Basiskompetenzen: string[];
@@ -23,6 +24,7 @@ const SkillsPage = () => {
   const [apiResponse, setApiResponse] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [clickedSkills, setClickedSkills] = useState<number[]>([]);
+  const { selectedSkills, setSelectedSkills } = useContext(SkillsContext);
   const [error, setError] = useState('');
   const activeStepIndex = 3;
 
@@ -188,6 +190,12 @@ const SkillsPage = () => {
     }
   };
 
+  const handleConfirm = () => {
+    // Collect selected skills and update the context
+    setSelectedSkills(/* collected skills */);
+    // Navigate to SkillLevelPage
+  };
+
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-10">
@@ -206,9 +214,13 @@ const SkillsPage = () => {
           {renderSkills()}
   
       {error && <div className="text-red-500">Error: {error}</div>}
-      <div className="flex justify-end">
+
+      {/* <div className="flex justify-end">
         <Button onClick={handleSave}>Speichern</Button>
-      </div>
+      </div> */}
+
+      <Button onClick={handleConfirm}>Bestätigen</Button>
+
       </Box>
   
         )}
