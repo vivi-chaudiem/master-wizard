@@ -2,9 +2,10 @@ import React, { useEffect, useState, useContext } from 'react';
 import StepperComponent from '../components/StepperComponent';
 import LoaderComponent from '../components/LoaderComponent';
 import { useRouter } from 'next/router';
-import { Box, Button, ListItem, UnorderedList, Checkbox, Stack } from '@chakra-ui/react';
+import { Box, Button, ListItem, UnorderedList, Checkbox, Stack, Table, Thead, Tr, Th, Tbody, TableContainer, Td, Radio, Select, Input, RadioGroup } from '@chakra-ui/react';
 import { toggleArrayValue } from '../utils/utils';
 import { SkillsContext } from 'context/skillscontext';
+import SkillsTableComponent from 'components/SkillsTableComponent';
 
 interface Competency {
     Basiskompetenzen: string[];
@@ -25,11 +26,55 @@ const SkillsPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [clickedSkills, setClickedSkills] = useState<number[]>([]);
   const { selectedSkills, setSelectedSkills } = useContext(SkillsContext);
+  const [skillLevels, setSkillLevels] = useState({});
+  const [skillsData, setSkillsData] = useState({});
+  const [addingNewSkill, setAddingNewSkill] = useState(false);
+  const [newSkillLevel, setNewSkillLevel] = useState('4');
+  const [newSkillCategory, setNewSkillCategory] = useState('');
+  const [newSkillName, setNewSkillName] = useState('');
   const [error, setError] = useState('');
   const activeStepIndex = 3;
 
   const handleButtonClick = (index) => {
     setClickedSkills((prev) => toggleArrayValue(prev, index));
+  };
+
+  const handleEdit = (roleIndex, category, skillIndex, newLevel) => {
+    const skillKey = `${roleIndex}-${category}-${skillIndex}`;
+    setSkillLevels(prev => ({ ...prev, [skillKey]: newLevel }));
+  };
+
+  const handleAddSkill = () => {
+    setAddingNewSkill(true);
+  };
+  
+  const handleRemoveSkill = (roleIndex, category, skillIndex) => {
+    const categoryKey = `${roleIndex}-${category}`;
+    setSkillsData(prev => {
+      const updatedSkills = [...(prev[categoryKey] || [])];
+      updatedSkills.splice(skillIndex, 1);  // Remove the skill
+      return { ...prev, [categoryKey]: updatedSkills };
+    });
+  };
+
+  const handleSaveNewSkill = (roleIndex) => {
+    const categoryKey = `${roleIndex}-${newSkillCategory}`;
+    const newSkill = { name: newSkillName, level: newSkillLevel };
+    setSkillsData(prev => ({
+      ...prev,
+      [categoryKey]: [...(prev[categoryKey] || []), newSkill]
+    }));
+    setAddingNewSkill(false);
+    setNewSkillName('');
+    setNewSkillCategory('');
+    setNewSkillLevel('4');
+  };
+  
+  const handleCancelNewSkill = () => {
+    setAddingNewSkill(false);
+    setNewSkillName('');
+    setNewSkillCategory('');
+    setNewSkillLevel('4');
   };
 
   useEffect(() => {
@@ -120,35 +165,88 @@ const SkillsPage = () => {
     console.log('Arbeitsschritt: ', apiResponseObj[0].Arbeitsschritt);
 
     return (
-
       <div>
-        {apiResponse && apiResponseObj.map((item, index) => (
-          <div key={index}>
-            <h3 className="h3-skill-title">{roleNumber++}. Rolle: {item.Rolle}</h3>
-            <UnorderedList>
-              <ListItem><b>Arbeitsschritt: </b>{item.Arbeitsschritt}</ListItem>
-              <ListItem><b>Kompetenzen:</b></ListItem>
-            </UnorderedList>
-            <div className="competency-container">
-              {Object.entries(item.Kompetenzen).map(([category, skills], categoryIndex) => (
-                <div key={categoryIndex} className="category-container">
-                  {/* <UnorderedList ml={10}>
-                    <ListItem className="competency-category">{category}:</ListItem>
-                    {(skills as string[]).map((skill, skillIndex) => (
-                      <ListItem ml={10} key={skillIndex}>{skill}</ListItem>
-                    ))}
-                  </UnorderedList> */}
-                    <UnorderedList ml={10}>
-                      <ListItem className="competency-category">{category}:</ListItem>
-                    </UnorderedList>
-                    {(skills as string[]).map((skill, skillIndex) => (
-                      <Stack spacing={[1, 5]} direction={['column', 'row']}>
-                        <Checkbox ml={10} key={skillIndex}>{skill}</Checkbox>
-                      </Stack>
-                    ))}
-                </div>
-              ))}
-            </div>
+        {apiResponse && apiResponseObj.map((item, roleIndex) => (
+          <div key={roleIndex}>
+            <h3 className="h3-skill-title">{roleIndex + 1}. Rolle: {item.Rolle} ({item.Arbeitsschritt})</h3>
+
+            <TableContainer>
+              <Table variant="simple">
+                <Thead>
+                  <Tr>
+                    <Th>Kategorie</Th>
+                    <Th>Kompetenz</Th>
+                    <Th>4 Level</Th>
+                    <Th>1 Level</Th>
+                    <Th>Aktion</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {Object.entries(item.Kompetenzen).map(([category, skills], categoryIndex) => (
+                    <React.Fragment key={categoryIndex}>
+                      {skills.map((skill, skillIndex) => {
+                        const skillKey = `${roleIndex}-${category}-${skillIndex}`;
+                        return (
+                          <Tr key={skillIndex}>
+                            {skillIndex === 0 && <Td rowSpan={skills.length}>{category}</Td>}
+                            <Td>{skill}</Td>
+                            <Td>
+                              <Radio
+                                isChecked={skillLevels[skillKey] !== '1'}
+                                onChange={() => handleEdit(roleIndex, category, skillIndex, '4')}
+                              >
+                                4
+                              </Radio>
+                            </Td>
+                            <Td>
+                              <Radio
+                                isChecked={skillLevels[skillKey] === '1'}
+                                onChange={() => handleEdit(roleIndex, category, skillIndex, '1')}
+                              >
+                                1
+                              </Radio>
+                            </Td>
+                            <Td>
+                              <Button onClick={() => handleRemoveSkill(roleIndex, category, skillIndex)}>x</Button>
+                            </Td>
+                          </Tr>
+                        );
+                      })}
+                    </React.Fragment>
+                  ))}
+                  {addingNewSkill && (
+                    <Tr>
+                      <Td>
+                        <Select placeholder="Auswählen" value={newSkillCategory} onChange={(e) => setNewSkillCategory(e.target.value)}>
+                          <option value="Basiskompetenzen">Basiskompetenzen</option>
+                          <option value="Funktionale Kompetenzen">Funktionale Kompetenzen</option>
+                          <option value="Methodenkompetenzen">Methodenkompetenzen</option>
+                          <option value="Soft Skills">Soft Skills</option>
+                        </Select>
+                      </Td>
+                      <Td>
+                        <Input placeholder="Kompetenz" value={newSkillName} onChange={(e) => setNewSkillName(e.target.value)} />
+                      </Td>
+                      <Td>
+                        <RadioGroup onChange={setNewSkillLevel} value={newSkillLevel}>
+                          <Radio value="4">4</Radio>
+                        </RadioGroup>
+                      </Td>
+                      <Td>
+                        <RadioGroup onChange={setNewSkillLevel} value={newSkillLevel}>
+                          <Radio value="1">1</Radio>
+                        </RadioGroup>
+                      </Td>
+                      <Td>
+                        <Button onClick={() => handleSaveNewSkill(roleIndex)}>+</Button>
+                        <Button onClick={handleCancelNewSkill}>x</Button>
+                      </Td>
+                    </Tr>
+                )}
+                </Tbody>
+              </Table>
+              <Button onClick={handleAddSkill}>Hinzufügen</Button>
+            </TableContainer>
           </div>
         ))}
       </div>
@@ -190,11 +288,11 @@ const SkillsPage = () => {
     }
   };
 
-  const handleConfirm = () => {
-    // Collect selected skills and update the context
-    setSelectedSkills(/* collected skills */);
-    // Navigate to SkillLevelPage
-  };
+  // const handleConfirm = () => {
+  //   // Collect selected skills and update the context
+  //   setSelectedSkills(/* collected skills */);
+  //   // Navigate to SkillLevelPage
+  // };
 
 
   return (
@@ -210,7 +308,7 @@ const SkillsPage = () => {
 
       {apiResponse && (
       <Box className="answer-box">
-          <h2 className="h2-answer-box">Für diese Rollen gibt es üblicherweise folgende Fähigkeiten:<br/><br/></h2>
+          <h2 className="h2-answer-box">Für diese Rollen gibt es üblicherweise folgende Fähigkeiten.<br></br><br></br>Sofern die Fähigkeit zutrifft und übernommen werden soll, dokumentiere, ob die Fähigkeit 4 erreichbare Level hat &#40;Basis, Könner, Kenner, Profi&#41; oder lediglich 1 &#40;Fähigkeit muss vorhanden oder nicht vorhanden sein&#41;.</h2>
           {renderSkills()}
   
       {error && <div className="text-red-500">Error: {error}</div>}
@@ -219,7 +317,7 @@ const SkillsPage = () => {
         <Button onClick={handleSave}>Speichern</Button>
       </div> */}
 
-      <Button onClick={handleConfirm}>Bestätigen</Button>
+      {/* <Button onClick={handleConfirm}>Bestätigen</Button> */}
 
       </Box>
   

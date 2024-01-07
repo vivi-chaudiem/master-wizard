@@ -11,29 +11,31 @@ const steps = [
 
 const StepperComponent = ({ activeIndex }) => {
   return (
-    <Stepper size='lg' colorScheme='customBlue' index={activeIndex}>
-      {steps.map((step, index) => (
-        <Step key={index}>
-          <StepIndicator>
-            <StepStatus
-              complete={<StepIcon />}
-              incomplete={<StepNumber />}
-              active={<StepNumber />}
-            />
-          </StepIndicator >
+    <Box marginTop="5rem">
+      <Stepper size='lg' colorScheme='customBlue' index={activeIndex}>
+        {steps.map((step, index) => (
+          <Step key={index}>
+            <StepIndicator>
+              <StepStatus
+                complete={<StepIcon />}
+                incomplete={<StepNumber />}
+                active={<StepNumber />}
+              />
+            </StepIndicator >
 
-            <Box flexShrink='1'>
-              <StepTitle>{step.title}</StepTitle>
-              <StepDescription>{step.description}</StepDescription>
+              <Box flexShrink='1'>
+                <StepTitle>{step.title}</StepTitle>
+                <StepDescription>{step.description}</StepDescription>
+              </Box>
+
+            <Box>
+              <StepSeparator />
             </Box>
-
-          <Box>
-            <StepSeparator />
-          </Box>
-          
-        </Step>
-      ))}
-    </Stepper>
+            
+          </Step>
+        ))}
+      </Stepper>
+    </Box>
   );
 };
 

@@ -10,8 +10,8 @@
     border-radius: 0.25rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     background-color: white;
-    width: 100%;
-    max-width: 36rem;
+    width: 90%;
+    max-width: auto;
   }
 
 .h2-answer-box {
@@ -29,7 +29,8 @@ margin-bottom: 1rem;
 .h3-skill-title {
     font-weight: bold; 
     font-size: 1.1rem; 
-    margin-top: 2rem; 
+    margin-top: 2rem;
+    margin-bottom: 1rem;
 }
 
 .competency-category {
