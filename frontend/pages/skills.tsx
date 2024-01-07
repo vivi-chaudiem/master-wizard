@@ -60,10 +60,12 @@ const SkillsPage = () => {
   const handleSaveNewSkill = (roleIndex) => {
     const categoryKey = `${roleIndex}-${newSkillCategory}`;
     const newSkill = { name: newSkillName, level: newSkillLevel };
+  
     setSkillsData(prev => ({
       ...prev,
       [categoryKey]: [...(prev[categoryKey] || []), newSkill]
     }));
+  
     setAddingNewSkill(false);
     setNewSkillName('');
     setNewSkillCategory('');
@@ -178,54 +180,51 @@ const SkillsPage = () => {
                     <Th>Kompetenz</Th>
                     <Th>4 Level</Th>
                     <Th>1 Level</Th>
-                    <Th>Aktion</Th>
+                    <Th></Th>
                   </Tr>
                 </Thead>
                 <Tbody>
                   {Object.entries(item.Kompetenzen).map(([category, skills], categoryIndex) => (
                     <React.Fragment key={categoryIndex}>
-                      {skills.map((skill, skillIndex) => {
-                        const skillKey = `${roleIndex}-${category}-${skillIndex}`;
-                        return (
-                          <Tr key={skillIndex}>
-                            {skillIndex === 0 && <Td rowSpan={skills.length}>{category}</Td>}
-                            <Td>{skill}</Td>
-                            <Td>
-                              <Radio
-                                isChecked={skillLevels[skillKey] !== '1'}
-                                onChange={() => handleEdit(roleIndex, category, skillIndex, '4')}
-                              >
-                                4
-                              </Radio>
-                            </Td>
-                            <Td>
-                              <Radio
-                                isChecked={skillLevels[skillKey] === '1'}
-                                onChange={() => handleEdit(roleIndex, category, skillIndex, '1')}
-                              >
-                                1
-                              </Radio>
-                            </Td>
-                            <Td>
-                              <Button onClick={() => handleRemoveSkill(roleIndex, category, skillIndex)}>x</Button>
-                            </Td>
-                          </Tr>
-                        );
-                      })}
+                      {(skillsData[`${roleIndex}-${category}`] || skills).map((skill, skillIndex) => (
+                        <Tr key={`${roleIndex}-${category}-${skillIndex}`}>
+                          {skillIndex === 0 && <Td rowSpan={skills.length}>{category}</Td>}
+                          <Td>{skill.name || skill}</Td>
+                          <Td>
+                            <Radio
+                              isChecked={skillLevels[`${roleIndex}-${category}-${skillIndex}`] !== '1'}
+                              onChange={() => handleEdit(roleIndex, category, skillIndex, '4')}
+                            >
+                              4
+                            </Radio>
+                          </Td>
+                          <Td>
+                            <Radio
+                              isChecked={skillLevels[`${roleIndex}-${category}-${skillIndex}`] === '1'}
+                              onChange={() => handleEdit(roleIndex, category, skillIndex, '1')}
+                            >
+                              1
+                            </Radio>
+                          </Td>
+                          <Td>
+                            <Button onClick={() => handleRemoveSkill(roleIndex, category, skillIndex)}>x</Button>
+                          </Td>
+                        </Tr>
+                      ))}
                     </React.Fragment>
                   ))}
                   {addingNewSkill && (
                     <Tr>
                       <Td>
-                        <Select placeholder="Auswählen" value={newSkillCategory} onChange={(e) => setNewSkillCategory(e.target.value)}>
+                        <Select placeholder="Select category" value={newSkillCategory} onChange={(e) => setNewSkillCategory(e.target.value)}>
                           <option value="Basiskompetenzen">Basiskompetenzen</option>
-                          <option value="Funktionale Kompetenzen">Funktionale Kompetenzen</option>
                           <option value="Methodenkompetenzen">Methodenkompetenzen</option>
+                          <option value="Funktionale Kompetenzen">Funktionale Kompetenzen</option>
                           <option value="Soft Skills">Soft Skills</option>
                         </Select>
                       </Td>
                       <Td>
-                        <Input placeholder="Kompetenz" value={newSkillName} onChange={(e) => setNewSkillName(e.target.value)} />
+                        <Input placeholder="Skill name" value={newSkillName} onChange={(e) => setNewSkillName(e.target.value)} />
                       </Td>
                       <Td>
                         <RadioGroup onChange={setNewSkillLevel} value={newSkillLevel}>
@@ -238,14 +237,16 @@ const SkillsPage = () => {
                         </RadioGroup>
                       </Td>
                       <Td>
-                        <Button onClick={() => handleSaveNewSkill(roleIndex)}>+</Button>
+                        <Button className="mr-2" onClick={() => handleSaveNewSkill(roleIndex)}>+</Button>
                         <Button onClick={handleCancelNewSkill}>x</Button>
                       </Td>
                     </Tr>
-                )}
+                  )}
                 </Tbody>
               </Table>
-              <Button onClick={handleAddSkill}>Hinzufügen</Button>
+                {!addingNewSkill && (
+                  <Button className="mt-3" onClick={handleAddSkill}>Kompetenz hinzufügen</Button>
+                )}
             </TableContainer>
           </div>
         ))}
@@ -308,7 +309,7 @@ const SkillsPage = () => {
 
       {apiResponse && (
       <Box className="answer-box">
-          <h2 className="h2-answer-box">Für diese Rollen gibt es üblicherweise folgende Fähigkeiten.<br></br><br></br>Sofern die Fähigkeit zutrifft und übernommen werden soll, dokumentiere, ob die Fähigkeit 4 erreichbare Level hat &#40;Basis, Könner, Kenner, Profi&#41; oder lediglich 1 &#40;Fähigkeit muss vorhanden oder nicht vorhanden sein&#41;.</h2>
+          <h2 className="h2-answer-box">Nachfolgend werden die Fähigkeiten angezeigt, die es üblicherweise für diese Rollen gibt.<br></br><br></br>Sofern die Fähigkeit zutrifft und übernommen werden soll, dokumentiere, ob die Fähigkeit 4 maximal erreichbare Level hat &#40;Basis, Könner, Kenner, Profi&#41; oder 1 Level &#40;Fähigkeit muss vorhanden oder nicht vorhanden sein&#41;.</h2>
           {renderSkills()}
   
       {error && <div className="text-red-500">Error: {error}</div>}
