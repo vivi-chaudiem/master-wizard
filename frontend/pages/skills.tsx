@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, use } from 'react';
 import StepperComponent from '../components/StepperComponent';
 import LoaderComponent from '../components/LoaderComponent';
 import { useRouter } from 'next/router';
@@ -33,7 +33,7 @@ const SkillsPage = () => {
   const [newSkillStates, setNewSkillStates] = useState({});
   const [newSkillError, setNewSkillError] = useState({});
   const [error, setError] = useState('');
-  const activeStepIndex = 3;
+  const activeStepIndex = 2;
 
   const initializeNewSkillState = (roleIndex) => {
     setNewSkillStates(prev => ({
@@ -53,7 +53,9 @@ const SkillsPage = () => {
 
   const handleAddSkill = (roleIndex) => {
     const { newSkillName, newSkillLevel, newSkillCategory } = newSkillStates[roleIndex];
-    const newSkill = { name: newSkillName, level: newSkillLevel };
+    const newSkill = { 
+      bezeichnung: newSkillName, 
+      maxlevel: newSkillLevel };
 
     // Validate the input
     if (!newSkillName || !newSkillCategory) {
@@ -67,7 +69,6 @@ const SkillsPage = () => {
       return;
     }
   
-
     setApiResponseObj(prev => {
       const updated = [...prev];
       const categorySkills = updated[roleIndex].Kompetenzen[newSkillCategory] || [];
@@ -110,7 +111,7 @@ const SkillsPage = () => {
       const updated = [...prev];
       const skill = updated[roleIndex].Kompetenzen[category][skillIndex];
       if (skill) {
-        skill.level = newLevel; 
+        skill.maxlevel = newLevel; 
       }
       return updated;
     });
@@ -159,6 +160,18 @@ const SkillsPage = () => {
         const data = await response.json();
         setApiResponse(data);
         const parsedData = JSON.parse(data);
+
+        // Initialize existing skills with default (max. 4 level)
+        parsedData.forEach((item) => {
+          for (const category in item.Kompetenzen) {
+            const skillsArray = item.Kompetenzen[category];
+            item.Kompetenzen[category] = skillsArray.map((skill) => ({
+              bezeichnung: skill,
+              maxlevel: '4',
+            }));
+          }
+        });
+
         setApiResponseObj(parsedData);
   
         // Initialize newSkillStates for each role
@@ -191,14 +204,6 @@ const SkillsPage = () => {
 
     fetchData();
   }, [router.query]);
-  
-  function isObject(input: any): boolean {
-    return typeof input === 'object' && input !== null;
-  }
-
-  function isString(input: any): boolean {
-    return typeof input === 'string';
-  }
 
   const renderSkills = () => {
     if (isLoading) {
@@ -211,7 +216,7 @@ const SkillsPage = () => {
   
     return (
       <div>
-        {apiResponseObj && apiResponseObj.map((item, roleIndex) => (
+        {apiResponse && apiResponseObj && apiResponseObj.map((item, roleIndex) => (
           <div key={roleIndex}>
             <h3 className="h3-skill-title">{roleIndex + 1}. Rolle: {item.Rolle} ({item.Arbeitsschritt})</h3>
   
@@ -232,10 +237,10 @@ const SkillsPage = () => {
                       {skills.map((skill, skillIndex) => (
                         <Tr key={`${roleIndex}-${category}-${skillIndex}`}>
                           {skillIndex === 0 && <Td rowSpan={skills.length}>{category}</Td>}
-                          <Td>{skill.name || skill}</Td>
+                          <Td>{skill.bezeichnung || skill}</Td>
                           <Td>
                             <Radio
-                              isChecked={skill.level !== '1'}
+                              isChecked={skill.maxlevel !== '1'}
                               onChange={() => handleEdit(roleIndex, category, skillIndex, '4')}
                             >
                               4
@@ -243,7 +248,7 @@ const SkillsPage = () => {
                           </Td>
                           <Td>
                             <Radio
-                              isChecked={skill.level === '1'}
+                              isChecked={skill.maxlevel === '1'}
                               onChange={() => handleEdit(roleIndex, category, skillIndex, '1')}
                             >
                               1
@@ -324,46 +329,47 @@ const SkillsPage = () => {
     );
   };
     
-  const handleSave = async () => {
-    setIsLoading(true);
-    try {
-        let apiResponseObj: ApiResponse[] = JSON.parse(apiResponse);
+  // const handleSave = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //       let apiResponseObj: ApiResponse[] = JSON.parse(apiResponse);
 
-        const response = await fetch('http://127.0.0.1:8080/api/save-competencies', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(apiResponseObj)
-        });
+  //       const response = await fetch('http://127.0.0.1:8080/api/save-competencies', {
+  //           method: 'POST',
+  //           headers: {
+  //               'Content-Type': 'application/json',
+  //           },
+  //           body: JSON.stringify(apiResponseObj)
+  //       });
 
-        const result = await response.json();
-        if (!response.ok) {
-            throw new Error(result.message || `Error: ${response.status}`);
-        }
+  //       const result = await response.json();
+  //       if (!response.ok) {
+  //           throw new Error(result.message || `Error: ${response.status}`);
+  //       }
 
-        console.log('Save successful:', result);
-        router.push('/success');
+  //       console.log('Save successful:', result);
+  //       router.push('/success');
 
-      } catch (error: unknown) {
-      if (error instanceof Error) {
-          console.error('Error saving competencies:', error);
-          setError(error.message || 'Unbekannter Fehler beim Speichern!');
-          alert(error.message || 'Fehler beim Speichern!');
-      } else {
-          // Handle cases where the error is not an Error object
-          console.error('An unexpected error occurred:', error);
-          setError('Unbekannter Fehler beim Speichern!');
-          alert('Unbekannter Fehler beim Speichern!');
-      }
-    }
-  };
-
-  // const handleConfirm = () => {
-  //   // Collect selected skills and update the context
-  //   setSelectedSkills(/* collected skills */);
-  //   // Navigate to SkillLevelPage
+  //     } catch (error: unknown) {
+  //     if (error instanceof Error) {
+  //         console.error('Error saving competencies:', error);
+  //         setError(error.message || 'Unbekannter Fehler beim Speichern!');
+  //         alert(error.message || 'Fehler beim Speichern!');
+  //     } else {
+  //         // Handle cases where the error is not an Error object
+  //         console.error('An unexpected error occurred:', error);
+  //         setError('Unbekannter Fehler beim Speichern!');
+  //         alert('Unbekannter Fehler beim Speichern!');
+  //     }
+  //   }
   // };
+
+  const handleConfirm = () => {
+    console.log('apiResponseObj:', apiResponseObj);
+    setSelectedSkills(apiResponseObj);
+
+    router.push('/skill-level');
+  };
 
 
   return (
@@ -376,7 +382,6 @@ const SkillsPage = () => {
               <LoaderComponent />
           )}
 
-
       {apiResponse && (
       <Box className="answer-box">
           <h2 className="h2-answer-box">Nachfolgend werden die Fähigkeiten angezeigt, die es üblicherweise für diese Rollen gibt.<br></br><br></br>Sofern die Fähigkeit zutrifft und übernommen werden soll, dokumentiere, ob die Fähigkeit 4 maximal erreichbare Level hat &#40;Basis, Könner, Kenner, Profi&#41; oder 1 Level &#40;Fähigkeit muss vorhanden oder nicht vorhanden sein&#41;.</h2>
@@ -388,7 +393,9 @@ const SkillsPage = () => {
         <Button onClick={handleSave}>Speichern</Button>
       </div> */}
 
-      {/* <Button onClick={handleConfirm}>Bestätigen</Button> */}
+      <div className="flex justify-end">
+        <Button onClick={handleConfirm}>Bestätigen</Button>
+      </div>
 
       </Box>
   

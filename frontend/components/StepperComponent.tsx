@@ -3,9 +3,10 @@ import React from 'react';
 import { useSteps, Stepper, Step, StepIndicator, StepStatus, StepIcon, StepNumber, StepTitle, StepDescription, StepSeparator, Box, Progress } from '@chakra-ui/react';
 
 const steps = [
-  { title: 'Produkt', description: 'Abfrage' },
-  { title: 'Rollen', description: 'Validierung' },
-  { title: 'Fähigkeiten', description: 'Validierung' },
+  { title: 'Produkt', description: 'Produktionsschritte' },
+  { title: 'Rollen', description: 'Je Schritt' },
+  { title: 'Fähigkeiten', description: 'Max. Level' },
+  { title: 'Fähigkeiten', description: 'Soll-Level' },
   { title: 'Fertig!', description: 'Datenspeicherung' },
 ];
 

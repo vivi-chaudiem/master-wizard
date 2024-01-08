@@ -12,7 +12,7 @@ const RolesPage = () => {
   const [clickedRoles, setClickedRoles] = useState<number[]>([]);
   const [additionalRole, setAdditionalRole] = useState('');
   const [error, setError] = useState('');
-  const activeStepIndex = 2;
+  const activeStepIndex = 1;
 
   const handleButtonClick = (index) => {
     setClickedRoles((prev) => toggleArrayValue(prev, index));

@@ -1,18 +1,22 @@
 import React, { createContext, useState, ReactNode } from 'react';
 
-// Define the structure for Competency based on your API response
-interface Competency {
-  Basiskompetenzen: string[];
-  Methodenkompetenzen: string[];
-  FunktionaleKompetenzen: string[];
-  SoftSkills: string[];
-}
-
 // Define the structure for ApiResponse
 interface ApiResponse {
   Arbeitsschritt: string;
   Rolle: string;
-  Kompetenzen: Competency;
+  Kompetenzen: ListOfCompetencies;
+}
+
+interface ListOfCompetencies {
+  "Basiskompetenzen": string[];
+  "Methodenkompetenzen": string[];
+  "Funktionale Kompetenzen": string[];
+  "Soft Skills": string[];
+}
+
+interface Competency {
+  bezeichnung: string;
+  maxlevel: string;
 }
 
 // Context type
