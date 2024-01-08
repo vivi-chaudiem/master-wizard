@@ -1,16 +1,45 @@
-import { Box, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import { Box, Button, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import StepperComponent from "components/StepperComponent";
 import { SkillsContext } from "context/skillscontext";
-import React from "react";
+import React, { useEffect } from "react";
 import { useContext, useState } from "react";
 
 
 const SkillLevelPage = () => {
   const activeStepIndex = 3;
-  const { selectedSkills } = useContext(SkillsContext);
+  const { selectedSkills } = useContext(SkillsContext);
   const [error, setError] = useState('');
+  const [updatedSkills, setUpdatedSkills] = useState(selectedSkills);
 
-  console.log(selectedSkills);
+  const [skillLevels, setSkillLevels] = useState({});
+
+  useEffect(() => {
+    const skillLevelsInit = selectedSkills.reduce((acc, item, roleIndex) => {
+      acc[roleIndex] = {};
+      Object.entries(item.Kompetenzen).forEach(([category, skills]) => {
+        acc[roleIndex][category] = skills.map(skill => ({ ...skill, targetlevel: 0 }));
+      });
+      return acc;
+    }, {});
+    setSkillLevels(skillLevelsInit);
+  }, [selectedSkills]);
+
+  const handleLevelChange = (roleIndex, category, skillIndex, value) => {
+    setSkillLevels(prev => ({
+      ...prev,
+      [roleIndex]: {
+        ...prev[roleIndex],
+        [category]: prev[roleIndex][category].map((skill, index) => 
+          index === skillIndex ? { ...skill, targetlevel: value } : skill
+        )
+      }
+    }));
+  };
+
+  const handleSave = () => {
+    console.log('Updated Skills with Target Levels:', skillLevels);
+    // Implement the save logic here
+  };
 
   const renderSkills = () => {
     if (error) {
@@ -42,7 +71,12 @@ const SkillLevelPage = () => {
                           <Td>{skill.bezeichnung}</Td>
                           <Td>{skill.maxlevel}</Td>
                           <Td>
-                            <NumberInput defaultValue={0} min={0} max={skill.maxlevel}>
+                            <NumberInput 
+                              defaultValue={0} 
+                              min={0} 
+                              max={skill.maxlevel}
+                              onChange={(value) => handleLevelChange(roleIndex, category, skillIndex, value)}
+                              >
                               <NumberInputField />
                               <NumberInputStepper>
                                 <NumberIncrementStepper />
@@ -76,11 +110,11 @@ const SkillLevelPage = () => {
 
         {error && <div className="text-red-500">Error: {error}</div>}
 
-        {/* <div className="flex justify-end">
+        <div className="flex justify-end">
           <Button onClick={handleSave}>Speichern</Button>
-        </div> */}
+        </div> 
 
-        </Box>
+      </Box>
   
     </div>
     );
