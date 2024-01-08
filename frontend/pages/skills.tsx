@@ -2,10 +2,9 @@ import React, { useEffect, useState, useContext } from 'react';
 import StepperComponent from '../components/StepperComponent';
 import LoaderComponent from '../components/LoaderComponent';
 import { useRouter } from 'next/router';
-import { Box, Button, ListItem, UnorderedList, Checkbox, Stack, Table, Thead, Tr, Th, Tbody, TableContainer, Td, Radio, Select, Input, RadioGroup } from '@chakra-ui/react';
+import { Box, Button, Table, Thead, Tr, Th, Tbody, TableContainer, Td, Radio, Select, Input, RadioGroup, Text } from '@chakra-ui/react';
 import { toggleArrayValue } from '../utils/utils';
 import { SkillsContext } from 'context/skillscontext';
-import SkillsTableComponent from 'components/SkillsTableComponent';
 
 interface Competency {
     Basiskompetenzen: string[];
@@ -23,60 +22,105 @@ interface ApiResponse {
 const SkillsPage = () => {
   const router = useRouter();
   const [apiResponse, setApiResponse] = useState<string>("");
+  const [apiResponseObj, setApiResponseObj] = useState<ApiResponse[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [clickedSkills, setClickedSkills] = useState<number[]>([]);
   const { selectedSkills, setSelectedSkills } = useContext(SkillsContext);
-  const [skillLevels, setSkillLevels] = useState({});
-  const [skillsData, setSkillsData] = useState({});
   const [addingNewSkill, setAddingNewSkill] = useState(false);
   const [newSkillLevel, setNewSkillLevel] = useState('4');
   const [newSkillCategory, setNewSkillCategory] = useState('');
   const [newSkillName, setNewSkillName] = useState('');
+  const [newSkillStates, setNewSkillStates] = useState({});
+  const [newSkillError, setNewSkillError] = useState({});
   const [error, setError] = useState('');
   const activeStepIndex = 3;
+
+  const initializeNewSkillState = (roleIndex) => {
+    setNewSkillStates(prev => ({
+      ...prev,
+      [roleIndex]: {
+        newSkillLevel: '4',
+        newSkillCategory: '',
+        newSkillName: '',
+        addingNewSkill: false
+      }
+    }));
+  };
 
   const handleButtonClick = (index) => {
     setClickedSkills((prev) => toggleArrayValue(prev, index));
   };
 
-  const handleEdit = (roleIndex, category, skillIndex, newLevel) => {
-    const skillKey = `${roleIndex}-${category}-${skillIndex}`;
-    setSkillLevels(prev => ({ ...prev, [skillKey]: newLevel }));
-  };
+  const handleAddSkill = (roleIndex) => {
+    const { newSkillName, newSkillLevel, newSkillCategory } = newSkillStates[roleIndex];
+    const newSkill = { name: newSkillName, level: newSkillLevel };
 
-  const handleAddSkill = () => {
-    setAddingNewSkill(true);
+    // Validate the input
+    if (!newSkillName || !newSkillCategory) {
+      setNewSkillError(prev => ({
+        ...prev,
+        [roleIndex]: {
+          nameError: !newSkillName,
+          categoryError: !newSkillCategory,
+        }
+      }));
+      return;
+    }
+  
+
+    setApiResponseObj(prev => {
+      const updated = [...prev];
+      const categorySkills = updated[roleIndex].Kompetenzen[newSkillCategory] || [];
+      updated[roleIndex].Kompetenzen[newSkillCategory] = [...categorySkills, newSkill];
+      return updated;
+    });
+
+    setNewSkillStates(prev => ({
+      ...prev,
+      [roleIndex]: { ...prev[roleIndex], addingNewSkill: false, newSkillName: '', newSkillCategory: '', newSkillLevel: '4' }
+    }));
+  
+    // Resetting the state
+    setAddingNewSkill(false);
+    setNewSkillName('');
+    setNewSkillCategory('');
+    setNewSkillLevel('4');
+
+    // Reset the error state
+    setNewSkillError(prev => ({
+      ...prev,
+      [roleIndex]: {
+        nameError: false,
+        categoryError: false,
+      }
+    }));
   };
   
   const handleRemoveSkill = (roleIndex, category, skillIndex) => {
-    const categoryKey = `${roleIndex}-${category}`;
-    setSkillsData(prev => {
-      const updatedSkills = [...(prev[categoryKey] || [])];
-      updatedSkills.splice(skillIndex, 1);  // Remove the skill
-      return { ...prev, [categoryKey]: updatedSkills };
+    setApiResponseObj(prev => {
+      const updated = [...prev];
+      const categorySkills = updated[roleIndex].Kompetenzen[category];
+      categorySkills.splice(skillIndex, 1);
+      return updated;
     });
   };
-
-  const handleSaveNewSkill = (roleIndex) => {
-    const categoryKey = `${roleIndex}-${newSkillCategory}`;
-    const newSkill = { name: newSkillName, level: newSkillLevel };
   
-    setSkillsData(prev => ({
-      ...prev,
-      [categoryKey]: [...(prev[categoryKey] || []), newSkill]
-    }));
-  
-    setAddingNewSkill(false);
-    setNewSkillName('');
-    setNewSkillCategory('');
-    setNewSkillLevel('4');
+  const handleEdit = (roleIndex, category, skillIndex, newLevel) => {
+    setApiResponseObj(prev => {
+      const updated = [...prev];
+      const skill = updated[roleIndex].Kompetenzen[category][skillIndex];
+      if (skill) {
+        skill.level = newLevel; 
+      }
+      return updated;
+    });
   };
   
-  const handleCancelNewSkill = () => {
-    setAddingNewSkill(false);
-    setNewSkillName('');
-    setNewSkillCategory('');
-    setNewSkillLevel('4');
+  const handleCancelNewSkill = (roleIndex) => {
+    setNewSkillStates(prev => ({
+      ...prev,
+      [roleIndex]: { ...prev[roleIndex], addingNewSkill: false }
+    }));
   };
 
   useEffect(() => {
@@ -100,32 +144,34 @@ const SkillsPage = () => {
             product: product,
             production_steps: production_steps,
             roles: roles,
-          }),
-        }).then(function(response) {
-          return response.json();
-        }).then(function(data) {
-            console.log(data);
-            setApiResponse(data);
-        }).catch( err =>  {
-            console.log(err);
+          })
         });
-      
-        // if (!response.ok) {
-        //   throw new Error(`Error: ${response.status}`);
-        // }
+        // }).then(function(response) {
+        //   return response.json();
+        // }).then(function(data) {
+        //     console.log(data);
+        //     setApiResponse(data);
+        //     setApiResponseObj(JSON.parse(data));
+        // }).catch( err =>  {
+        //     console.log(err);
+        // });
 
-        // const data = await response.json();
-    
-        // const indexOfBracket = data.indexOf('[');
-        // if (indexOfBracket !== -1) {
-        //   const trimmedData = data.substring(indexOfBracket);
-        //   data = trimmedData;
-        //   console.log('Data after trimming: ', data);
-        // } else {
-        //   console.log('No "[" character found in the text.');
-        // }
-        
-        // setApiResponse(data);
+        const data = await response.json();
+        setApiResponse(data);
+        const parsedData = JSON.parse(data);
+        setApiResponseObj(parsedData);
+  
+        // Initialize newSkillStates for each role
+        const initialSkillStates = {};
+        parsedData.forEach((_, index) => {
+          initialSkillStates[index] = {
+            newSkillLevel: '4',
+            newSkillCategory: '',
+            newSkillName: '',
+            addingNewSkill: false
+          };
+        });
+        setNewSkillStates(initialSkillStates);
 
       } catch (err: unknown) {
         if (err instanceof Error) {
@@ -136,6 +182,10 @@ const SkillsPage = () => {
       } finally {
         setIsLoading(false);
       }
+
+      // if (apiResponseObj.length > 0) {
+      //   apiResponseObj.forEach((_, index) => initializeNewSkillState(index));
+      // }
 
     }
 
@@ -151,8 +201,6 @@ const SkillsPage = () => {
   }
 
   const renderSkills = () => {
-    let roleNumber = 1;
-
     if (isLoading) {
       return <LoaderComponent />;
     }
@@ -160,18 +208,13 @@ const SkillsPage = () => {
     if (error) {
       return <div className="text-red-500">Error: {error}</div>;
     }
-
-    console.log(apiResponse);
-
-    let apiResponseObj: ApiResponse[] = JSON.parse(apiResponse);
-    console.log('Arbeitsschritt: ', apiResponseObj[0].Arbeitsschritt);
-
+  
     return (
       <div>
-        {apiResponse && apiResponseObj.map((item, roleIndex) => (
+        {apiResponseObj && apiResponseObj.map((item, roleIndex) => (
           <div key={roleIndex}>
             <h3 className="h3-skill-title">{roleIndex + 1}. Rolle: {item.Rolle} ({item.Arbeitsschritt})</h3>
-
+  
             <TableContainer>
               <Table variant="simple">
                 <Thead>
@@ -180,19 +223,19 @@ const SkillsPage = () => {
                     <Th>Kompetenz</Th>
                     <Th>4 Level</Th>
                     <Th>1 Level</Th>
-                    <Th></Th>
+                    <Th>Aktion</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
                   {Object.entries(item.Kompetenzen).map(([category, skills], categoryIndex) => (
                     <React.Fragment key={categoryIndex}>
-                      {(skillsData[`${roleIndex}-${category}`] || skills).map((skill, skillIndex) => (
+                      {skills.map((skill, skillIndex) => (
                         <Tr key={`${roleIndex}-${category}-${skillIndex}`}>
                           {skillIndex === 0 && <Td rowSpan={skills.length}>{category}</Td>}
                           <Td>{skill.name || skill}</Td>
                           <Td>
                             <Radio
-                              isChecked={skillLevels[`${roleIndex}-${category}-${skillIndex}`] !== '1'}
+                              isChecked={skill.level !== '1'}
                               onChange={() => handleEdit(roleIndex, category, skillIndex, '4')}
                             >
                               4
@@ -200,7 +243,7 @@ const SkillsPage = () => {
                           </Td>
                           <Td>
                             <Radio
-                              isChecked={skillLevels[`${roleIndex}-${category}-${skillIndex}`] === '1'}
+                              isChecked={skill.level === '1'}
                               onChange={() => handleEdit(roleIndex, category, skillIndex, '1')}
                             >
                               1
@@ -213,47 +256,74 @@ const SkillsPage = () => {
                       ))}
                     </React.Fragment>
                   ))}
-                  {addingNewSkill && (
+                  {newSkillStates[roleIndex]?.addingNewSkill && (
                     <Tr>
                       <Td>
-                        <Select placeholder="Select category" value={newSkillCategory} onChange={(e) => setNewSkillCategory(e.target.value)}>
+                        <Select
+                          placeholder="Auswählen"
+                          value={newSkillStates[roleIndex].newSkillCategory}
+                          onChange={(e) => setNewSkillStates(prev => ({
+                            ...prev,
+                            [roleIndex]: { ...prev[roleIndex], newSkillCategory: e.target.value }
+                          }))}
+                          isInvalid={newSkillError[roleIndex]?.categoryError}
+                        >
                           <option value="Basiskompetenzen">Basiskompetenzen</option>
-                          <option value="Methodenkompetenzen">Methodenkompetenzen</option>
                           <option value="Funktionale Kompetenzen">Funktionale Kompetenzen</option>
+                          <option value="Methodenkompetenzen">Methodenkompetenzen</option>
                           <option value="Soft Skills">Soft Skills</option>
                         </Select>
+                        {newSkillError[roleIndex]?.categoryError && <Text mt="0.5em" color="red.500">Pflichtfeld</Text>}
                       </Td>
                       <Td>
-                        <Input placeholder="Skill name" value={newSkillName} onChange={(e) => setNewSkillName(e.target.value)} />
+                        <Input
+                          placeholder="Kompetenz"
+                          value={newSkillStates[roleIndex]?.newSkillName || ''}
+                          onChange={(e) => setNewSkillStates(prev => ({
+                            ...prev,
+                            [roleIndex]: { ...prev[roleIndex], newSkillName: e.target.value }
+                          }))}
+                          isInvalid={newSkillError[roleIndex]?.nameError}
+                        />
+                        {newSkillError[roleIndex]?.nameError && <Text mt="0.5em" color="red.500">Pflichtfeld</Text>}
                       </Td>
                       <Td>
-                        <RadioGroup onChange={setNewSkillLevel} value={newSkillLevel}>
+                        <RadioGroup onChange={(e) => setNewSkillStates(prev => ({
+                          ...prev,
+                          [roleIndex]: { ...prev[roleIndex], newSkillLevel: e }
+                        }))} value={newSkillStates[roleIndex].newSkillLevel}>
                           <Radio value="4">4</Radio>
                         </RadioGroup>
                       </Td>
                       <Td>
-                        <RadioGroup onChange={setNewSkillLevel} value={newSkillLevel}>
+                        <RadioGroup onChange={(e) => setNewSkillStates(prev => ({
+                          ...prev,
+                          [roleIndex]: { ...prev[roleIndex], newSkillLevel: e }
+                        }))} value={newSkillStates[roleIndex].newSkillLevel}>
                           <Radio value="1">1</Radio>
                         </RadioGroup>
                       </Td>
                       <Td>
-                        <Button className="mr-2" onClick={() => handleSaveNewSkill(roleIndex)}>+</Button>
-                        <Button onClick={handleCancelNewSkill}>x</Button>
+                        <Button className="mr-2" onClick={() => handleAddSkill(roleIndex)}>+</Button>
+                        <Button onClick={() => handleCancelNewSkill(roleIndex)}>x</Button>
                       </Td>
                     </Tr>
                   )}
                 </Tbody>
               </Table>
-                {!addingNewSkill && (
-                  <Button className="mt-3" onClick={handleAddSkill}>Kompetenz hinzufügen</Button>
-                )}
+              {!newSkillStates[roleIndex]?.addingNewSkill ? (
+                <Button className="mt-3" onClick={() => setNewSkillStates(prev => ({
+                  ...prev,
+                  [roleIndex]: { ...prev[roleIndex], addingNewSkill: true }
+                }))}>Kompetenz hinzufügen</Button>
+              ) : null}
             </TableContainer>
           </div>
         ))}
       </div>
     );
   };
-
+    
   const handleSave = async () => {
     setIsLoading(true);
     try {
