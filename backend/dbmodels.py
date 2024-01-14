@@ -17,6 +17,8 @@ class Competency(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     kompetenz_typ: Mapped[str] = mapped_column(String)
     bezeichnung: Mapped[str] = mapped_column(String)
+    max_level: Mapped[str] = mapped_column(String)
+    soll_level: Mapped[str] = mapped_column(String)
     rolle_id: Mapped[int] = mapped_column(ForeignKey("rolle.id"))
     rolle: Mapped["Role"] = relationship("Role", back_populates="kompetenzen")
 

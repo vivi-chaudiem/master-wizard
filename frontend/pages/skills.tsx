@@ -4,19 +4,25 @@ import LoaderComponent from '../components/LoaderComponent';
 import { useRouter } from 'next/router';
 import { Box, Button, Table, Thead, Tr, Th, Tbody, TableContainer, Td, Radio, Select, Input, RadioGroup, Text } from '@chakra-ui/react';
 import { toggleArrayValue } from '../utils/utils';
-import { SkillsContext } from 'context/skillscontext';
+import { ApiResponse, SkillsContext } from 'context/skillscontext';
+
+// interface ApiResponse {
+//   Arbeitsschritt: string;
+//   Rolle: string;
+//   Kompetenzen: Competency;
+// }
 
 interface Competency {
-    Basiskompetenzen: string[];
-    Methodenkompetenzen: string[];
-    "Funktionale Kompetenzen": string[];
-    "Soft Skills": string[];
-  }
-  
-interface ApiResponse {
-  Arbeitsschritt: string;
-  Rolle: string;
-  Kompetenzen: Competency;
+  Basiskompetenzen: Skill[];
+  Methodenkompetenzen: Skill[];
+  "Funktionale Kompetenzen": Skill[];
+  "Soft Skills": Skill[];
+}
+
+interface Skill {
+  bezeichnung: string;
+  maxlevel: string;
+  targetlevel: string;
 }
 
 const SkillsPage = () => {
@@ -53,10 +59,12 @@ const SkillsPage = () => {
 
   const handleAddSkill = (roleIndex) => {
     const { newSkillName, newSkillLevel, newSkillCategory } = newSkillStates[roleIndex];
-    const newSkill = { 
-      bezeichnung: newSkillName, 
-      maxlevel: newSkillLevel };
-
+    const newSkill = {
+      bezeichnung: newSkillName,
+      maxlevel: newSkillLevel,
+      targetlevel: "0" 
+    };
+  
     // Validate the input
     if (!newSkillName || !newSkillCategory) {
       setNewSkillError(prev => ({
@@ -111,12 +119,12 @@ const SkillsPage = () => {
       const updated = [...prev];
       const skill = updated[roleIndex].Kompetenzen[category][skillIndex];
       if (skill) {
-        skill.maxlevel = newLevel; 
+        skill.maxlevel = newLevel;
       }
       return updated;
     });
   };
-  
+
   const handleCancelNewSkill = (roleIndex) => {
     setNewSkillStates(prev => ({
       ...prev,
@@ -158,22 +166,26 @@ const SkillsPage = () => {
         // });
 
         const data = await response.json();
-        setApiResponse(data);
+        // setApiResponse(data);
         const parsedData = JSON.parse(data);
 
-        // Initialize existing skills with default (max. 4 level)
-        parsedData.forEach((item) => {
-          for (const category in item.Kompetenzen) {
-            const skillsArray = item.Kompetenzen[category];
-            item.Kompetenzen[category] = skillsArray.map((skill) => ({
-              bezeichnung: skill,
-              maxlevel: '4',
-            }));
-          }
-        });
+        const transformedData = parsedData.map(item => ({
+        ...item,
+        Kompetenzen: Object.fromEntries(
+          Object.entries(item.Kompetenzen).map(([category, skillNames]): [string, Skill[]] => [
+            category, 
+            (skillNames as string[]).map(skillName => ({ 
+              bezeichnung: skillName, 
+              maxlevel: '4', // Default value for maxlevel
+              targetlevel: '0' // Default value for targetlevel
+            }))
+          ])
+        )
+      }));
 
-        setApiResponseObj(parsedData);
-  
+      setApiResponseObj(transformedData);
+      console.log('transformedData:', transformedData);
+
         // Initialize newSkillStates for each role
         const initialSkillStates = {};
         parsedData.forEach((_, index) => {
@@ -216,7 +228,7 @@ const SkillsPage = () => {
   
     return (
       <div>
-        {apiResponse && apiResponseObj && apiResponseObj.map((item, roleIndex) => (
+        {apiResponseObj && apiResponseObj.map((item, roleIndex) => (
           <div key={roleIndex}>
             <h3 className="h3-skill-title">{roleIndex + 1}. Rolle: {item.Rolle} ({item.Arbeitsschritt})</h3>
   
@@ -232,34 +244,34 @@ const SkillsPage = () => {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {Object.entries(item.Kompetenzen).map(([category, skills], categoryIndex) => (
-                    <React.Fragment key={categoryIndex}>
-                      {skills.map((skill, skillIndex) => (
-                        <Tr key={`${roleIndex}-${category}-${skillIndex}`}>
-                          {skillIndex === 0 && <Td rowSpan={skills.length}>{category}</Td>}
-                          <Td>{skill.bezeichnung || skill}</Td>
-                          <Td>
-                            <Radio
-                              isChecked={skill.maxlevel !== '1'}
-                              onChange={() => handleEdit(roleIndex, category, skillIndex, '4')}
-                            >
-                              4
-                            </Radio>
-                          </Td>
-                          <Td>
-                            <Radio
-                              isChecked={skill.maxlevel === '1'}
-                              onChange={() => handleEdit(roleIndex, category, skillIndex, '1')}
-                            >
-                              1
-                            </Radio>
-                          </Td>
-                          <Td>
-                            <Button onClick={() => handleRemoveSkill(roleIndex, category, skillIndex)}>x</Button>
-                          </Td>
-                        </Tr>
-                      ))}
-                    </React.Fragment>
+                {Object.entries(item.Kompetenzen).map(([category, skills], categoryIndex) => (
+                  <React.Fragment key={`${roleIndex}-${category}-${categoryIndex}`}>
+                    {skills.map((skill, skillIndex) => (
+                      <Tr key={`${roleIndex}-${category}-${skillIndex}`}>
+                        {skillIndex === 0 && <Td rowSpan={skills.length}>{category}</Td>}
+                        <Td>{skill.bezeichnung}</Td>
+                        <Td>
+                          <Radio
+                            isChecked={skill.maxlevel !== '1'}
+                            onChange={() => handleEdit(roleIndex, category, skillIndex, '4')}
+                          >
+                            4
+                          </Radio>
+                        </Td>
+                        <Td>
+                          <Radio
+                            isChecked={skill.maxlevel === '1'}
+                            onChange={() => handleEdit(roleIndex, category, skillIndex, '1')}
+                          >
+                            1
+                          </Radio>
+                        </Td>
+                        <Td>
+                          <Button onClick={() => handleRemoveSkill(roleIndex, category, skillIndex)}>x</Button>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </React.Fragment>
                   ))}
                   {newSkillStates[roleIndex]?.addingNewSkill && (
                     <Tr>
@@ -371,18 +383,17 @@ const SkillsPage = () => {
     router.push('/skill-level');
   };
 
-
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-10">
       <div className="pb-20 width: '100%'">
         <StepperComponent activeIndex={activeStepIndex} />
       </div>
 
-      {isLoading && !apiResponse && (
+      {isLoading && !apiResponseObj && (
               <LoaderComponent />
           )}
 
-      {apiResponse && (
+      {apiResponseObj && (
       <Box className="answer-box">
           <h2 className="h2-answer-box">Nachfolgend werden die Fähigkeiten angezeigt, die es üblicherweise für diese Rollen gibt.<br></br><br></br>Sofern die Fähigkeit zutrifft und übernommen werden soll, dokumentiere, ob die Fähigkeit 4 maximal erreichbare Level hat &#40;Basis, Könner, Kenner, Profi&#41; oder 1 Level &#40;Fähigkeit muss vorhanden oder nicht vorhanden sein&#41;.</h2>
           {renderSkills()}

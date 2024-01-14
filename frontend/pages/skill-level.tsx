@@ -1,47 +1,69 @@
 import { Box, Button, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import StepperComponent from "components/StepperComponent";
 import { SkillsContext } from "context/skillscontext";
-import React, { useEffect } from "react";
+import { useRouter } from "next/router";
+import React from "react";
 import { useContext, useState } from "react";
 
-
 const SkillLevelPage = () => {
+  const router = useRouter();
   const activeStepIndex = 3;
-  const { selectedSkills } = useContext(SkillsContext);
+  const { selectedSkills, setSelectedSkills } = useContext(SkillsContext);
   const [error, setError] = useState('');
-  const [updatedSkills, setUpdatedSkills] = useState(selectedSkills);
-
-  const [skillLevels, setSkillLevels] = useState({});
-
-  useEffect(() => {
-    const skillLevelsInit = selectedSkills.reduce((acc, item, roleIndex) => {
-      acc[roleIndex] = {};
-      Object.entries(item.Kompetenzen).forEach(([category, skills]) => {
-        acc[roleIndex][category] = skills.map(skill => ({ ...skill, targetlevel: 0 }));
-      });
-      return acc;
-    }, {});
-    setSkillLevels(skillLevelsInit);
-  }, [selectedSkills]);
 
   const handleLevelChange = (roleIndex, category, skillIndex, value) => {
-    setSkillLevels(prev => ({
-      ...prev,
-      [roleIndex]: {
-        ...prev[roleIndex],
-        [category]: prev[roleIndex][category].map((skill, index) => 
-          index === skillIndex ? { ...skill, targetlevel: value } : skill
-        )
+    const updatedSkills = selectedSkills.map((role, index) => {
+      if (index === roleIndex) {
+        const updatedCompetencies = { ...role.Kompetenzen };
+        updatedCompetencies[category] = updatedCompetencies[category].map((skill, idx) =>
+          idx === skillIndex ? { ...skill, targetlevel: value } : skill
+        );
+  
+        return { ...role, Kompetenzen: updatedCompetencies };
       }
-    }));
-  };
+      return role;
+    });
+  
+    setSelectedSkills(updatedSkills);
+  };  
+  
+  const handleSave = async () => {
 
-  const handleSave = () => {
-    console.log('Updated Skills with Target Levels:', skillLevels);
-    // Implement the save logic here
+    try {
+        const response = await fetch('http://127.0.0.1:8080/api/save-competencies', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(selectedSkills)
+        });
+
+        console.log('Sent body:', selectedSkills);
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.message || `Error: ${response.status}`);
+        }
+
+        console.log('Save successful:', result);
+        router.push('/success');
+
+      } catch (error: unknown) {
+      if (error instanceof Error) {
+          console.error('Error saving competencies:', error);
+          setError(error.message || 'Unbekannter Fehler beim Speichern!');
+          alert(error.message || 'Fehler beim Speichern!');
+      } else {
+          // Handle cases where the error is not an Error object
+          console.error('An unexpected error occurred:', error);
+          setError('Unbekannter Fehler beim Speichern!');
+          alert('Unbekannter Fehler beim Speichern!');
+      }
+    }
   };
 
   const renderSkills = () => {
+  
     if (error) {
       return <div className="text-red-500">Error: {error}</div>;
     }
@@ -64,9 +86,9 @@ const SkillLevelPage = () => {
                 </Thead>
                 <Tbody>
                   {Object.entries(item.Kompetenzen).map(([category, skills], categoryIndex) => (
-                    <React.Fragment key={categoryIndex}>
-                      {skills.map((skill, skillIndex) => (
-                        <Tr key={`${roleIndex}-${category}-${skillIndex}`}>
+                    <React.Fragment key={`${roleIndex}-${category}-${categoryIndex}`}>
+                  {skills.map((skill, skillIndex) => (
+                      <Tr key={`${roleIndex}-${category}-${skillIndex}`}>
                           {skillIndex === 0 && <Td rowSpan={skills.length}>{category}</Td>}
                           <Td>{skill.bezeichnung}</Td>
                           <Td>{skill.maxlevel}</Td>

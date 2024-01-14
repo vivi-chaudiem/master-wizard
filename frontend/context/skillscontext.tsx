@@ -1,22 +1,22 @@
 import React, { createContext, useState, ReactNode } from 'react';
 
-// Define the structure for ApiResponse
-interface ApiResponse {
-  Arbeitsschritt: string;
-  Rolle: string;
-  Kompetenzen: ListOfCompetencies;
-}
-
-interface ListOfCompetencies {
-  "Basiskompetenzen": string[];
-  "Methodenkompetenzen": string[];
-  "Funktionale Kompetenzen": string[];
-  "Soft Skills": string[];
-}
-
 interface Competency {
   bezeichnung: string;
   maxlevel: string;
+  targetlevel: string;
+}
+
+interface ListOfCompetencies {
+  "Basiskompetenzen": Competency[];
+  "Methodenkompetenzen": Competency[];
+  "Funktionale Kompetenzen": Competency[];
+  "Soft Skills": Competency[];
+}
+
+export interface ApiResponse {
+  Arbeitsschritt: string;
+  Rolle: string;
+  Kompetenzen: ListOfCompetencies;
 }
 
 // Context type
