@@ -79,7 +79,6 @@ def init_routes(app):
                 arbeitsschritt = item.get("Arbeitsschritt")
                 rolle = item.get("Rolle")
 
-                # Create an instance of YourModel and save the data
                 new_role = Role(
                     arbeitsschritt=arbeitsschritt,
                     bezeichnung=rolle,
@@ -88,10 +87,19 @@ def init_routes(app):
                 db.session.flush()
 
                 for kompetenz_typ, kompetenzen in item.get("Kompetenzen", {}).items():
-                    for bezeichnung in kompetenzen:
+                    for kompetenz in kompetenzen:
+                        if isinstance(kompetenz, dict):
+                            bezeichnung = kompetenz.get("bezeichnung")
+                            maxlevel = kompetenz.get("maxlevel")
+                            targetlevel = kompetenz.get("targetlevel")
+                        else:
+                            print("Kompetenz is not a dictionary")
+
                         new_competency = Competency(
                             kompetenz_typ=kompetenz_typ,
                             bezeichnung=bezeichnung,
+                            max_level=maxlevel,
+                            soll_level=targetlevel,
                             rolle_id=new_role.id
                         )
                         db.session.add(new_competency)
