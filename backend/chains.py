@@ -1,6 +1,47 @@
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
+from langchain.agents import create_sql_agent
+from langchain.agents.agent_types import AgentType
+from langchain.sql_database import SQLDatabase
+from langchain.agents.agent_toolkits import SQLDatabaseToolkit
+from langchain.agents.agent_types import AgentType
+from langchain.chat_models import ChatOpenAI
+from flask import current_app
+
 import json
+import dotenv
+import os
+import openai
+
+def get_db_uri():
+    return current_app.config['SQLALCHEMY_DATABASE_URI']
+
+# Standardization of production steps chain
+def standardize_production_steps():
+    db_uri=get_db_uri()
+    db=SQLDatabase.from_uri(db_uri)
+
+    # Load environment variables
+    dotenv.load_dotenv()
+    openai.api_key = os.getenv("OPEN_AI_API_KEY")
+
+    llm = ChatOpenAI(
+        openai_api_key=openai.api_key, 
+        model_name="gpt-3.5-turbo"
+        )
+
+    toolkit = SQLDatabaseToolkit(
+        db=db,
+        llm=llm
+    )
+    
+    agent_executor = create_sql_agent(
+        llm=llm,
+        toolkit=toolkit,
+        verbose=True,
+        agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    )
+    return agent_executor.run("Gib mir eine Liste mit den existierenden Arbeitsschritten aus. Falls die Tabelle leer ist, überspringe diesen Schritt.")
 
 # Production steps chain
 def run_production_steps_chain(llm, product):
