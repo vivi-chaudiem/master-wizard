@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from backend.chains import run_production_steps_chain, run_roles_chain, run_skills_chain
 from langchain.chat_models import ChatOpenAI
+from langchain_community.document_loaders import PyPDFLoader
 import dotenv
 import os
 import openai
@@ -56,6 +57,9 @@ def init_routes(app):
         # Load background information
         background_info_path = "backend/documents/background_info.txt"
         background_info = read_file(background_info_path)
+        # loader = PyPDFLoader("backend/documents/background_info.pdf")
+        # background_info = loader.load()
+        # print(background_info)
 
         # Load the JSON-style template as a raw string
         json_template_path = "backend/documents/skills_json_description.json"
