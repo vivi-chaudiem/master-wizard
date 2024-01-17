@@ -3,6 +3,7 @@ from flask_cors import CORS
 from backend.chains import run_production_steps_chain, run_roles_chain, run_skills_chain
 from langchain.chat_models import ChatOpenAI
 from langchain_community.document_loaders import PyPDFLoader
+from langchain.document_loaders import TextLoader
 import dotenv
 import os
 import openai
@@ -55,8 +56,10 @@ def init_routes(app):
         roles = data.get('roles')
 
         # Load background information
-        background_info_path = "backend/documents/background_info.txt"
-        background_info = read_file(background_info_path)
+        loader = TextLoader("backend/documents/background_info.txt")
+        documents = loader.load()
+        background_info = documents[0].page_content
+        print(background_info)
         # loader = PyPDFLoader("backend/documents/background_info.pdf")
         # background_info = loader.load()
         # print(background_info)
