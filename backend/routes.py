@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from backend.chains import run_production_steps_chain, run_roles_chain, run_skills_chain, standardize_production_steps
+from backend.chains import run_production_steps_chain, run_roles_chain, run_skills_chain
 from langchain.chat_models import ChatOpenAI
 import dotenv
 import os
@@ -30,7 +30,7 @@ def init_routes(app):
         result = run_production_steps_chain(llm, product)
 
         # Standardization test
-        print(standardize_production_steps())
+        # print(standardize_production_steps())
         return jsonify(result)
     
     @app.route('/api/get-roles', methods=['POST'])

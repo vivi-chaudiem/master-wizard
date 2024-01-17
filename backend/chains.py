@@ -7,58 +7,68 @@ from langchain.agents.agent_toolkits import SQLDatabaseToolkit
 from langchain.agents.agent_types import AgentType
 from langchain.chat_models import ChatOpenAI
 from flask import current_app
+from backend.dbextensions import db
+from backend.dbmodels import Role, Competency
 
 import json
 import dotenv
 import os
 import openai
 
-def get_db_uri():
-    return current_app.config['SQLALCHEMY_DATABASE_URI']
+# def get_db_uri():
+#     return current_app.config['SQLALCHEMY_DATABASE_URI']
 
-# Standardization of production steps chain
-def standardize_production_steps():
-    db_uri=get_db_uri()
-    db=SQLDatabase.from_uri(db_uri)
+# # Standardization of production steps chain
+# def standardize_production_steps():
+#     db_uri=get_db_uri()
+#     db=SQLDatabase.from_uri(db_uri)
 
-    # Load environment variables
-    dotenv.load_dotenv()
-    openai.api_key = os.getenv("OPEN_AI_API_KEY")
+#     # Load environment variables
+#     dotenv.load_dotenv()
+#     openai.api_key = os.getenv("OPEN_AI_API_KEY")
 
-    llm = ChatOpenAI(
-        openai_api_key=openai.api_key, 
-        model_name="gpt-3.5-turbo"
-        )
+#     llm = ChatOpenAI(
+#         openai_api_key=openai.api_key, 
+#         model_name="gpt-3.5-turbo",
+#         temperature=0
+#         )
 
-    toolkit = SQLDatabaseToolkit(
-        db=db,
-        llm=llm
-    )
+#     toolkit = SQLDatabaseToolkit(
+#         db=db,
+#         llm=llm
+#     )
     
-    agent_executor = create_sql_agent(
-        llm=llm,
-        toolkit=toolkit,
-        verbose=True,
-        agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-    )
-    return agent_executor.run("Gib mir eine Liste mit den existierenden Arbeitsschritten aus. Falls die Tabelle leer ist, überspringe diesen Schritt.")
+#     agent_executor = create_sql_agent(
+#         llm=llm,
+#         toolkit=toolkit,
+#         verbose=True,
+#         agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+#         return_only_outputs=True
+#     )
+#     return agent_executor.run("Wie viele Arbeitsschritte gibt es? Wenn es mindestens 1 Arbeitsschritt gibt, gib mir eine Liste mit allen Arbeitsschritten aus.")
 
 # Production steps chain
 def run_production_steps_chain(llm, product):
-    template = "Welche Fertigungslinien bzw. Arbeitsschritte könnten in der Produktion von dem Produkt {product} vorkommen? Bitte gib eine Liste ohne zusätzliche Erklärungen aus."
+    # # Get existing production steps from the DB first
+    existing_prod_steps = db.session.execute(db.select(Role.arbeitsschritt)).scalars().all()
+    print(existing_prod_steps)
+
+    # Ask for new production steps
+    template = "Welche Fertigungslinien bzw. Arbeitsschritte könnten in der Produktion des Produkts {product} auftreten? Deine Antwort sollte mit '1.', '2.', '3.', etc. beginnen. Beachte, dass die Liste möglicher Arbeitsschritte nicht auf die in der übergebenen Liste enthaltenen beschränkt ist. Falls es semantische Überschneidungen mit den folgenden Begriffen gibt, passe deine Formulierung entsprechend an, um Dopplungen zu vermeiden: {existing_prod_steps} Bitte gib eine Liste ohne zusätzliche Erklärungen aus."
 
     formatted_template = template.format(
-        product=product
+        product=product,
+        existing_prod_steps=existing_prod_steps
         )
 
     prompt = PromptTemplate(
-        input_variables=["product"], 
+        input_variables=["product, existing_prod_steps"], 
         template=formatted_template
         )
     
     chain = LLMChain(llm=llm, prompt=prompt)
 
-    return chain.run({"product": product})
+    return chain.run({"product": product, "existing_prod_steps": existing_prod_steps})
 
 # Roles chain
 def run_roles_chain(llm, product, production_steps):
