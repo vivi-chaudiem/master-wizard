@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from backend.chains import run_production_steps_chain, run_roles_chain, run_skills_chain
 from langchain.chat_models import ChatOpenAI
+from langchain_community.document_loaders import PyPDFLoader
+from langchain.document_loaders import TextLoader
 import dotenv
 import os
 import openai
@@ -28,6 +30,9 @@ def init_routes(app):
         data = request.json
         product = data.get('product')
         result = run_production_steps_chain(llm, product)
+
+        # Standardization test
+        # print(standardize_production_steps())
         return jsonify(result)
     
     @app.route('/api/get-roles', methods=['POST'])
@@ -51,8 +56,13 @@ def init_routes(app):
         roles = data.get('roles')
 
         # Load background information
-        background_info_path = "backend/documents/background_info.txt"
-        background_info = read_file(background_info_path)
+        loader = TextLoader("backend/documents/background_info.txt")
+        documents = loader.load()
+        background_info = documents[0].page_content
+        print(background_info)
+        # loader = PyPDFLoader("backend/documents/background_info.pdf")
+        # background_info = loader.load()
+        # print(background_info)
 
         # Load the JSON-style template as a raw string
         json_template_path = "backend/documents/skills_json_description.json"

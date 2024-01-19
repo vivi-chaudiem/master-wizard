@@ -27,7 +27,7 @@ def create_app():
     # Debug
     with app.app_context():
         try:
-            db.drop_all()
+            # db.drop_all()
             db.create_all()
             print("Tables dropped and created successfully.")
         except Exception as e:
