@@ -31,7 +31,7 @@ def run_production_steps_chain(llm, product):
 # Roles chain
 def run_roles_chain(llm, product, production_steps):
     ## Get existing roles from the DB first
-    existing_roles = db.session.execute(db.select(Role.arbeitsschritt, Role.bezeichnung)).scalars().all()
+    existing_roles = db.session.execute(db.select(Role.arbeitsschritt, Role.bezeichnung)).all()
     print(existing_roles)
 
     template = "Angenommen, in der Produktion des Produkts {product} sind folgende Arbeitsschritte definiert: {production_steps}. Welche Rollen könnten diesen Arbeitsschritten zugeordnet werden? (Beispiel: Dem Arbeitsschritt 'Montage' könnte die Rolle 'Monteur' zugeordnet sein.) Anbei eine Liste mit Rollen und den dazugehörigen Arbeitsschritten, die bereits bekannt sind: {existing_roles}. Beachte, dass die Antwort nicht auf die vorgegebene Liste beschränkt ist und auch darüber hinausgehende Möglichkeiten berücksichtigt werden sollen. Deine Antwort sollte mit '1.', '2.', '3.', etc. beginnen, und zwar in der Form '1. Monteur', ohne den dazugehörigen Arbeitsschritt zu wiederholen. Wenn es semantische Überschneidungen zwischen deiner Antwort und der Liste gibt, passe deine Formulierung entsprechend an, um Doppelungen zu vermeiden. Bitte gib eine einfache Liste mit den Rollen ohne zusätzliche Erklärungen aus."
@@ -54,7 +54,7 @@ def run_roles_chain(llm, product, production_steps):
 # Skills chain
 def run_skills_chain(llm, product, roles, production_steps, background_info, json_template):
     ## Get existing skills from the DB first
-    existing_skills = db.session.execute(db.select(Competency.bezeichnung, Competency.kompetenz_typ)).scalars().all()
+    existing_skills = db.session.execute(db.select(Competency.bezeichnung, Competency.kompetenz_typ)).all()
     print(existing_skills)
 
     json_string = json.dumps(json_template)
