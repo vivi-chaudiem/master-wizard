@@ -2,7 +2,6 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from backend.chains import run_production_steps_chain, run_roles_chain, run_skills_chain
 from langchain.chat_models import ChatOpenAI
-from langchain_community.document_loaders import PyPDFLoader
 from langchain.document_loaders import TextLoader
 import dotenv
 import os
@@ -30,50 +29,43 @@ def init_routes(app):
         data = request.json
         product = data.get('product')
         result = run_production_steps_chain(llm, product)
-
-        # Standardization test
-        # print(standardize_production_steps())
         return jsonify(result)
     
     @app.route('/api/get-roles', methods=['POST'])
     def run_roles():
+        # Load the JSON-style template as a raw string
+        json_template_path = "backend/documents/roles_json_description.json"
+        json_template = read_json(json_template_path)
+
         data = request.json
         product = data.get('product')
         production_steps = data.get('production_steps')
-        result = run_roles_chain(llm, product, production_steps)
+        result = run_roles_chain(llm, product, production_steps, json_template)
         return jsonify(result)
     
     @app.route('/api/get-skills', methods=['POST'])
     def run_skills():
         data = request.get_json()
 
+        print("DATA aus run_skills", data)
+
         if not data:
             return jsonify({'error': 'No JSON data provided'}), 400
 
         # Extract data from the JSON object
         product = data.get('product')
-        production_steps = data.get('production_steps')
-        roles = data.get('roles')
+        steps_and_roles_string = data.get('steps_and_roles_string')
 
         # Load background information
         loader = TextLoader("backend/documents/background_info.txt")
         documents = loader.load()
         background_info = documents[0].page_content
-        print(background_info)
-        # loader = PyPDFLoader("backend/documents/background_info.pdf")
-        # background_info = loader.load()
-        # print(background_info)
 
         # Load the JSON-style template as a raw string
         json_template_path = "backend/documents/skills_json_description.json"
         json_template = read_json(json_template_path)
 
-        if isinstance(json_template, dict):
-            print("json_template is a valid dictionary")
-        else:
-            print("json_template is not a dictionary")
-
-        result = run_skills_chain(llm, product, roles, production_steps, background_info, json_template)
+        result = run_skills_chain(llm, product, steps_and_roles_string, background_info, json_template)
         print(result)
         return jsonify(result)
     
