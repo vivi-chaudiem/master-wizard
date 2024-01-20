@@ -2,15 +2,21 @@ import React, { useEffect, useState } from 'react';
 import StepperComponent from '../components/StepperComponent';
 import LoaderComponent from '../components/LoaderComponent';
 import { useRouter } from 'next/router';
-import { Box, Button } from '@chakra-ui/react';
+import { Box, Button, Table, Thead, Tr, Th, Tbody, Td, Input, TableContainer, Flex  } from '@chakra-ui/react';
 import { toggleArrayValue } from '../utils/utils';
+
+interface ArbeitsschrittRolle {
+  Arbeitsschritt: string;
+  Rolle: string;
+}
 
 const RolesPage = () => {
   const router = useRouter();
-  const [apiResponse, setApiResponse] = useState<string | null>(null);
+  const [apiResponse, setApiResponse] = useState<ArbeitsschrittRolle[]>([]);
+  const [newArbeitsschritt, setNewArbeitsschritt] = useState('');
+  const [newRolle, setNewRolle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [clickedRoles, setClickedRoles] = useState<number[]>([]);
-  const [additionalRole, setAdditionalRole] = useState('');
   const [error, setError] = useState('');
   const activeStepIndex = 1;
 
@@ -18,14 +24,34 @@ const RolesPage = () => {
     setClickedRoles((prev) => toggleArrayValue(prev, index));
   };
 
+  const handleRemoveRole = (index: number) => {
+    const updatedData = sortApiResponse(apiResponse.filter((_, i) => i !== index));
+    setApiResponse(updatedData);
+  };  
+  
+  const handleAdd = () => {
+    if (newArbeitsschritt && newRolle) {
+      const updatedData = sortApiResponse([...apiResponse, { Arbeitsschritt: newArbeitsschritt, Rolle: newRolle }]);
+      setApiResponse(updatedData);
+      setNewArbeitsschritt('');
+      setNewRolle('');
+    }
+  };
+  
+  const sortApiResponse = (data: ArbeitsschrittRolle[]) => {
+    return data.sort((a, b) =>
+      a.Arbeitsschritt.localeCompare(b.Arbeitsschritt, undefined, { sensitivity: 'base' })
+    );
+  };  
+
   useEffect(() => {
     const product = router.query.product;
     const production_steps = Array.isArray(router.query.clickedSteps)
-    ? JSON.parse(router.query.clickedSteps[0])
-    : router.query.clickedSteps
-    ? JSON.parse(router.query.clickedSteps)
-    : [];
-
+      ? JSON.parse(router.query.clickedSteps[0])
+      : router.query.clickedSteps
+      ? JSON.parse(router.query.clickedSteps)
+      : [];
+  
     const fetchData = async () => {
       setIsLoading(true);
       try {
@@ -39,55 +65,122 @@ const RolesPage = () => {
             production_steps: production_steps,
           }),
         });
-    
+  
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`);
         }
-    
+  
         const data = await response.json();
-        // console.log(data);
-        // const steps = data.split('\n');
-        setApiResponse(data);
+        const parsedData = JSON.parse(data); 
+        const sortedData = sortApiResponse(parsedData);
+        setApiResponse(sortedData);
+  
+        console.log("Neue Antwort:", data);
       } catch (err: unknown) {
         if (err instanceof Error) {
-            setError(err.message);
-          } else {
-            setError('Unbekannter Fehler!');
-          }
-    }
+          setError(err.message);
+        } else {
+          setError('Unbekannter Fehler!');
+        }
+      } finally {
+        setIsLoading(false);
+      }
     };
-
+  
     fetchData();
-  }, [router.query]);
-
-  const handleAdditionalRoleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAdditionalRole(e.target.value);
-  };
+  }, [router.query]);  
 
   const handleConfirmClick = () => {
-    if (apiResponse) {
-      const selectedRoles = clickedRoles.map((index) => {
-          const stepText = apiResponse.split('\n')[index];
-          return stepText.replace(/^\d+\.\s*/, '').trim();
-      });
-      
-      // Add the additional step if it's not empty
-      if (additionalRole.trim() !== '') {
-        selectedRoles.push(additionalRole.trim());
-      }
+    console.log("Letzte apiResponse:", apiResponse);
 
-      router.push({
-          pathname: '/skills',
-          query: {
-            product: router.query.product,
-            production_steps: router.query.clickedSteps, 
-            roles: JSON.stringify(selectedRoles),
-      }});
-
-  } else {
-      console.error('apiResponse is null');
+    router.push({
+        pathname: '/skills',
+        query: {
+          product: router.query.product,
+          steps_and_roles_string: JSON.stringify(apiResponse),
+    }});
   }
-};
+
+//   const handleConfirmClick = () => {
+//     if (apiResponse) {
+//       const selectedRoles = clickedRoles.map((index) => {
+//           const stepText = apiResponse.split('\n')[index];
+//           return stepText.replace(/^\d+\.\s*/, '').trim();
+//       });
+      
+//       // Add the additional step if it's not empty
+//       if (additionalRole.trim() !== '') {
+//         selectedRoles.push(additionalRole.trim());
+//       }
+
+//       router.push({
+//           pathname: '/skills',
+//           query: {
+//             product: router.query.product,
+//             production_steps: router.query.clickedSteps, 
+//             roles: JSON.stringify(selectedRoles),
+//       }});
+
+//   } else {
+//       console.error('apiResponse is null');
+//   }
+// };
+
+const renderSkills = () => {
+  if (error) {
+    return <div className="text-red-500">Error: {error}</div>;
+  }
+
+  return (
+    <div>
+      <Box>
+        <TableContainer>
+          <Table variant="simple">
+            <Thead>
+              <Tr>
+                <Th>Arbeitsschritt</Th>
+                <Th>Rolle</Th>
+                <Th>Aktion</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {apiResponse.map((item, index) => (
+                <Tr key={index}>
+                  <Td>{item.Arbeitsschritt}</Td>
+                  <Td>{item.Rolle}</Td>
+                  <Td><Button onClick={() => handleRemoveRole(index)}>x</Button></Td>
+                </Tr>
+              ))}
+            </Tbody>
+            </Table>
+          
+            <Flex width="100%" mt="4">
+              <Input
+                placeholder="Arbeitsschritt"
+                value={newArbeitsschritt}
+                onChange={(e) => setNewArbeitsschritt(e.target.value)}
+                flex="4"
+                mr="2"
+              />
+              <Input
+                placeholder="Rolle"
+                value={newRolle}
+                onChange={(e) => setNewRolle(e.target.value)}
+                flex="4"
+                mr="2"
+              />
+              <Button
+                flex="1"
+                onClick={handleAdd}
+              >
+                Hinzufügen
+              </Button>
+            </Flex>
+        </TableContainer>
+      </Box>
+    </div>
+  );
+}
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-10">
@@ -95,42 +188,14 @@ const RolesPage = () => {
         <StepperComponent activeIndex={activeStepIndex} />
       </div>
   
-      {isLoading && !apiResponse && (
+      {isLoading && (
               <LoaderComponent />
           )}
 
-      {apiResponse && (
+      {apiResponse.length > 0 && (
       <Box className="answer-box">
-          <h2 className="h2-answer-box">Für diese Produktionsschritte gibt es üblicherweise folgende Rollen:<br/><br/><i>Bitte klicke alle Rollen an, die auf dein Werk zutreffen.</i></h2>
-          <div className="grid-answer-box">
-          {apiResponse.split('\n').map((step, index: number) => (
-              <Button
-              key={index}
-              onClick={() => handleButtonClick(index)}
-              sx={{
-                backgroundColor: clickedRoles.includes(index) ? '#0c4a6e' : '',
-                color: clickedRoles.includes(index) ? 'white' : 'black',
-              }}
-            >
-              {step}
-            </Button>
-          ))}
-          </div>
-
-          <div className="mt-10">
-              <label htmlFor="additionalRole" className="text-xl font-semibold">
-                Weitere Rollen (optional):
-              </label><br></br>
-              <input
-                type="text"
-                id="additionalRole"
-                name="additionalRole"
-                value={additionalRole}
-                onChange={handleAdditionalRoleChange}
-                className="free-text-field mt-4 w-full resize-y"
-                placeholder="Weitere Schritte hinzufügen"
-              />
-            </div>
+          <h2 className="h2-answer-box">Für diese Produktionsschritte gibt es üblicherweise folgende Rollen:<br/><br/><i>Bitte gebe die Rollen an, die auf dein Werk zutreffen.</i></h2>
+          {renderSkills()}
 
           <div className="flex justify-end">
             <button

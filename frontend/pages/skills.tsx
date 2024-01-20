@@ -6,12 +6,6 @@ import { Box, Button, Table, Thead, Tr, Th, Tbody, TableContainer, Td, Radio, Se
 import { toggleArrayValue } from '../utils/utils';
 import { ApiResponse, SkillsContext } from 'context/skillscontext';
 
-// interface ApiResponse {
-//   Arbeitsschritt: string;
-//   Rolle: string;
-//   Kompetenzen: Competency;
-// }
-
 interface Competency {
   Basiskompetenzen: Skill[];
   Methodenkompetenzen: Skill[];
@@ -134,12 +128,13 @@ const SkillsPage = () => {
 
   useEffect(() => {
     const product = router.query.product;
-    const production_steps = router.query.production_steps;
-    const roles = Array.isArray(router.query.roles)
-    ? JSON.parse(router.query.roles[0])
-    : router.query.roles
-    ? JSON.parse(router.query.roles)
-    : [];
+    const steps_and_roles_string = router.query.steps_and_roles_string;
+    // const production_steps = router.query.production_steps;
+    // const roles = Array.isArray(router.query.roles)
+    // ? JSON.parse(router.query.roles[0])
+    // : router.query.roles
+    // ? JSON.parse(router.query.roles)
+    // : [];
 
     const fetchData = async () => {
       setIsLoading(true);
@@ -151,19 +146,9 @@ const SkillsPage = () => {
           },
           body: JSON.stringify({
             product: product,
-            production_steps: production_steps,
-            roles: roles,
+            steps_and_roles_string: steps_and_roles_string
           })
         });
-        // }).then(function(response) {
-        //   return response.json();
-        // }).then(function(data) {
-        //     console.log(data);
-        //     setApiResponse(data);
-        //     setApiResponseObj(JSON.parse(data));
-        // }).catch( err =>  {
-        //     console.log(err);
-        // });
 
         const data = await response.json();
         // setApiResponse(data);
@@ -208,10 +193,6 @@ const SkillsPage = () => {
         setIsLoading(false);
       }
 
-      // if (apiResponseObj.length > 0) {
-      //   apiResponseObj.forEach((_, index) => initializeNewSkillState(index));
-      // }
-
     }
 
     fetchData();
@@ -228,7 +209,7 @@ const SkillsPage = () => {
   
     return (
       <div>
-        {apiResponseObj && apiResponseObj.map((item, roleIndex) => (
+        {apiResponseObj.length > 0 && apiResponseObj.map((item, roleIndex) => (
           <div key={roleIndex}>
             <h3 className="h3-skill-title">{roleIndex + 1}. Rolle: {item.Rolle} ({item.Arbeitsschritt})</h3>
   
@@ -340,41 +321,6 @@ const SkillsPage = () => {
       </div>
     );
   };
-    
-  // const handleSave = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //       let apiResponseObj: ApiResponse[] = JSON.parse(apiResponse);
-
-  //       const response = await fetch('http://127.0.0.1:8080/api/save-competencies', {
-  //           method: 'POST',
-  //           headers: {
-  //               'Content-Type': 'application/json',
-  //           },
-  //           body: JSON.stringify(apiResponseObj)
-  //       });
-
-  //       const result = await response.json();
-  //       if (!response.ok) {
-  //           throw new Error(result.message || `Error: ${response.status}`);
-  //       }
-
-  //       console.log('Save successful:', result);
-  //       router.push('/success');
-
-  //     } catch (error: unknown) {
-  //     if (error instanceof Error) {
-  //         console.error('Error saving competencies:', error);
-  //         setError(error.message || 'Unbekannter Fehler beim Speichern!');
-  //         alert(error.message || 'Fehler beim Speichern!');
-  //     } else {
-  //         // Handle cases where the error is not an Error object
-  //         console.error('An unexpected error occurred:', error);
-  //         setError('Unbekannter Fehler beim Speichern!');
-  //         alert('Unbekannter Fehler beim Speichern!');
-  //     }
-  //   }
-  // };
 
   const handleConfirm = () => {
     console.log('apiResponseObj:', apiResponseObj);
@@ -389,11 +335,11 @@ const SkillsPage = () => {
         <StepperComponent activeIndex={activeStepIndex} />
       </div>
 
-      {isLoading && !apiResponseObj && (
+      {isLoading && (
               <LoaderComponent />
           )}
 
-      {apiResponseObj && (
+      {apiResponseObj.length > 0 && (
       <Box className="answer-box">
           <h2 className="h2-answer-box">Nachfolgend werden die Fähigkeiten angezeigt, die es üblicherweise für diese Rollen gibt.<br></br><br></br>Sofern die Fähigkeit zutrifft und übernommen werden soll, dokumentiere, ob die Fähigkeit 4 maximal erreichbare Level hat &#40;Basis, Könner, Kenner, Profi&#41; oder 1 Level &#40;Fähigkeit muss vorhanden oder nicht vorhanden sein&#41;.</h2>
           {renderSkills()}
