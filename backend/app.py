@@ -10,7 +10,6 @@ sys.path.append(os.getcwd())
 
 from backend.routes import init_routes
 from backend.dbextensions import db
-from backend import dbmodels
 
 def create_app():
     app = Flask(__name__)

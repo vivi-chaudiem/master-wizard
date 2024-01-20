@@ -6,12 +6,6 @@ import { Box, Button, Table, Thead, Tr, Th, Tbody, TableContainer, Td, Radio, Se
 import { toggleArrayValue } from '../utils/utils';
 import { ApiResponse, SkillsContext } from 'context/skillscontext';
 
-// interface ApiResponse {
-//   Arbeitsschritt: string;
-//   Rolle: string;
-//   Kompetenzen: Competency;
-// }
-
 interface Competency {
   Basiskompetenzen: Skill[];
   Methodenkompetenzen: Skill[];
