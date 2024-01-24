@@ -5,4 +5,3 @@ dependencies:
   - python=3.8
   - flask
   - gunicorn
-  - other_dependencies
