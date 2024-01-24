@@ -32,7 +32,7 @@ const ProductPage = () => {
     setError('');
 
     try {
-      const response = await fetch('http://127.0.0.1:8080/api/get-production-steps', {
+      const response = await fetch('https://master-wizard-backend.onrender.com/api/get-production-steps', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
