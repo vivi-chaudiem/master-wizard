@@ -5,8 +5,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 class Role(db.Model):
     __tablename__ = 'rolle'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    arbeitsschritt: Mapped[str] = mapped_column(String)
-    bezeichnung: Mapped[str] = mapped_column(String)
+    arbeitsschritt: Mapped[str] = mapped_column(String(255))
+    bezeichnung: Mapped[str] = mapped_column(String(255))
     kompetenzen: Mapped["Competency"] = relationship(back_populates="rolle", cascade="all, delete-orphan")
 
     def __repr__(self):
@@ -15,10 +15,10 @@ class Role(db.Model):
 class Competency(db.Model):
     __tablename__ = 'kompetenz'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    kompetenz_typ: Mapped[str] = mapped_column(String)
-    bezeichnung: Mapped[str] = mapped_column(String)
-    max_level: Mapped[str] = mapped_column(String)
-    soll_level: Mapped[str] = mapped_column(String)
+    kompetenz_typ: Mapped[str] = mapped_column(String(255))
+    bezeichnung: Mapped[str] = mapped_column(String(255))
+    max_level: Mapped[str] = mapped_column(String(255))
+    soll_level: Mapped[str] = mapped_column(String(255))
     rolle_id: Mapped[int] = mapped_column(ForeignKey("rolle.id"))
     rolle: Mapped["Role"] = relationship("Role", back_populates="kompetenzen")
 
