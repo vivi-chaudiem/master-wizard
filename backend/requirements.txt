@@ -10,6 +10,7 @@ jsonschema-specifications==2023.7.1
 langchain==0.0.333
 langchain-community==0.0.12
 langchain-core==0.1.10
+openai==0.28.1
 PyMySQL==1.1.0
 pypdf==3.17.0
 python-dotenv==1.0.0
