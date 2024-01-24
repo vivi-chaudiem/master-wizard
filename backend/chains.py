@@ -1,7 +1,7 @@
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
-from backend.dbextensions import db
-from backend.dbmodels import Role, Competency
+from dbextensions import db
+from dbmodels import Role, Competency
 
 import json
 

@@ -1,15 +1,15 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from backend.chains import run_production_steps_chain, run_roles_chain, run_skills_chain
+from chains import run_production_steps_chain, run_roles_chain, run_skills_chain
 from langchain.chat_models import ChatOpenAI
 from langchain.document_loaders import TextLoader
 import dotenv
 import os
 import openai
 
-from backend.utils import read_file, read_json
-from backend.dbextensions import db
-from backend.dbmodels import Role, Competency
+from utils import read_file, read_json
+from dbextensions import db
+from dbmodels import Role, Competency
 
 def init_routes(app):
     

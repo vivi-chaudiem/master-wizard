@@ -9,8 +9,8 @@ import dotenv
 # print ls
 sys.path.append(os.getcwd())
 
-from backend.routes import init_routes
-from backend.dbextensions import db
+from routes import init_routes
+from dbextensions import db
 
 # Import the pymysql package and ensure it is used as the MySQL adapter
 import pymysql
@@ -52,5 +52,5 @@ def create_app():
 
 app = create_app()
 
-if __name__ == '__main__':
-    app.run(debug=True, port=8080)
+# if __name__ == '__main__':
+#     app.run(debug=False)
