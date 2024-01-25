@@ -1,29 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { createNextAuthMiddleware } from 'nextjs-basic-auth-middleware'
 
-export const config = {
-    matcher: '/', // Apply the middleware to all routes
+// Read environment variables for basic auth credentials
+const username = process.env.BASIC_AUTH_USERNAME;
+const password = process.env.BASIC_AUTH_PASSWORD;
+
+// Check if both username and password are available
+if (!username || !password) {
+    throw new Error("Basic authentication credentials are not set.");
+}
+
+const options = {
+    pathname: '/(.*)',
+    users: [
+        { name: username, password: password },
+    ],
 };
 
-export function middleware(req: NextRequest) {
-  const basicAuth = req.headers.get('authorization');
+export const middleware = createNextAuthMiddleware(options);
 
-  if (basicAuth) {
-    const authValue = basicAuth.split(' ')[1];
-    const [user, pwd] = atob(authValue).split(':');
-
-    const validUser = process.env.BASIC_AUTH_USERNAME;
-    const validPwd = process.env.BASIC_AUTH_PASSWORD;
-
-    if (user === validUser && pwd === validPwd) {
-      return NextResponse.next(); // Continue with the request if authentication is valid
-    }
-  }
-
-  // Return a custom error message when authentication fails
-  return new Response('Falsche Logindaten', {
-    status: 401, // HTTP status code for Unauthorized
-    headers: {
-      'Content-Type': 'text/plain', // Set the content type to plain text
-    },
-  });
+export const config = {
+    matcher: ['/(.*)'],
 }
