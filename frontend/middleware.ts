@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export const config = {
-  matcher: '*', // Apply the middleware to all routes
+    matcher: '/', // Apply the middleware to all routes
 };
 
 export function middleware(req: NextRequest) {
