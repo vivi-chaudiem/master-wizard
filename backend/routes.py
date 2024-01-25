@@ -61,7 +61,7 @@ def init_routes(app):
         background_info = documents[0].page_content
 
         # Load the JSON-style template as a raw string
-        json_template_path = "backend/documents/skills_json_description.json"
+        json_template_path = "documents/skills_json_description.json"
         json_template = read_json(json_template_path)
 
         result = run_skills_chain(llm, product, escaped_steps_and_roles_string, background_info, json_template)
