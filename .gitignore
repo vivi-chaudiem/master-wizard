@@ -1,3 +1,4 @@
 .env
+.env.local
 wizard-database.db
 venv/
