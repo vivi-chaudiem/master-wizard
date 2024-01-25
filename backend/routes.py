@@ -32,7 +32,7 @@ def init_routes(app):
     @app.route('/api/get-roles', methods=['POST'])
     def run_roles():
         # Load the JSON-style template as a raw string
-        json_template_path = "backend/documents/roles_json_description.json"
+        json_template_path = "documents/roles_json_description.json"
         json_template = read_json(json_template_path)
 
         data = request.json
@@ -56,7 +56,7 @@ def init_routes(app):
         escaped_steps_and_roles_string = steps_and_roles_string.replace("{", "{{").replace("}", "}}")
 
         # Load background information
-        loader = TextLoader("backend/documents/background_info.txt")
+        loader = TextLoader("documents/background_info.txt")
         documents = loader.load()
         background_info = documents[0].page_content
 
