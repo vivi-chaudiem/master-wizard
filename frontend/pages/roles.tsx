@@ -55,7 +55,7 @@ const RolesPage = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch('https://master-wizard-backend.onrender.com/api/get-roles', {
+        const response = await fetch('/api/get-roles', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

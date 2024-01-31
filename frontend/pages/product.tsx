@@ -37,7 +37,9 @@ const ProductPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ product: inputValue }),
+        body: JSON.stringify({ 
+          product: inputValue 
+        }),
       });
 
       if (!response.ok) {

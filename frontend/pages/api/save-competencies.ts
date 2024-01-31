@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     }
   
     try {
-      const response = await fetch('https://master-wizard-backend.onrender.com/api/get-production-steps', {
+      const response = await fetch('https://master-wizard-backend.onrender.com/api/save-competencies', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -27,4 +27,3 @@ export default async function handler(req, res) {
       }
     }
   }
-  

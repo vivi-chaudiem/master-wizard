@@ -139,7 +139,7 @@ const SkillsPage = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch('https://master-wizard-backend.onrender.com/api/get-skills', {
+        const response = await fetch('/api/get-skills', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -30,12 +30,12 @@ const SkillLevelPage = () => {
   const handleSave = async () => {
 
     try {
-        const response = await fetch('https://master-wizard-backend.onrender.com/api/save-competencies', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(selectedSkills)
+        const response = await fetch('/api/save-competencies', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(selectedSkills)
         });
 
         console.log('Sent body:', selectedSkills);
