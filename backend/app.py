@@ -43,7 +43,7 @@ def create_app():
             print(f"Error occurred: {e}")
 
     # Set up CORS
-    CORS(app, resources={r"/api/*": {"origins": "https://master-wizard-demo.vercel.app/"}})
+    CORS(app, resources={r"/api/*": {"origins": "https://master-wizard-demo.onrender.com/"}})
 
     # Initialize routes
     init_routes(app)
