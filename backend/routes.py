@@ -19,7 +19,7 @@ def init_routes(app):
 
     llm = ChatOpenAI(
         openai_api_key=openai.api_key, 
-        model_name="gpt-3.5-turbo"
+        model_name="gpt-3.5-turbo-1106"
         )
 
     @app.route('/api/get-production-steps', methods=['POST'])
