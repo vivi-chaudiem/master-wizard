@@ -33,6 +33,9 @@ def init_routes(app):
 
     @auth.verify_password
     def verify_password(username, password):
+        print(f"Received username: {username}")
+        print(f"Received password: {password}")
+
         if username in users and \
                 check_password_hash(users.get(username), password):
             return username
