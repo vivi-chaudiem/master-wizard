@@ -45,6 +45,9 @@ def init_routes(app):
     def run_skills():
         data = request.get_json()
 
+        print("Raw data:", request.data)  # Log raw request data
+        print("JSON data:", data)
+
         print("DATA aus run_skills", data)
 
         if not data:
