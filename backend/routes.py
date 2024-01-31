@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from flask_httpauth import HTTPBasicAuth
+from werkzeug.security import generate_password_hash, check_password_hash
 from chains import run_production_steps_chain, run_roles_chain, run_skills_chain
 from langchain.chat_models import ChatOpenAI
 from langchain.document_loaders import TextLoader
@@ -17,12 +19,27 @@ def init_routes(app):
     dotenv.load_dotenv()
     openai.api_key = os.getenv("OPEN_AI_API_KEY")
 
+    # Set up OpenAI API
     llm = ChatOpenAI(
         openai_api_key=openai.api_key, 
         model_name="gpt-3.5-turbo-1106"
         )
 
+    # Set up basic authentication
+    auth = HTTPBasicAuth()
+    users = {
+        os.getenv("BACKEND_USERNAME"): os.getenv("BACKEND_PASSWORD")
+    }
+
+    @auth.verify_password
+    def verify_password(username, password):
+        if username in users and \
+                check_password_hash(users.get(username), password):
+            return username
+
+    # Routes
     @app.route('/api/get-production-steps', methods=['POST'])
+    @auth.login_required
     def run_production():
         data = request.json
         product = data.get('product')
@@ -30,6 +47,7 @@ def init_routes(app):
         return jsonify(result)
     
     @app.route('/api/get-roles', methods=['POST'])
+    @auth.login_required
     def run_roles():
         # Load the JSON-style template as a raw string
         json_template_path = "documents/roles_json_description.json"
@@ -42,6 +60,7 @@ def init_routes(app):
         return jsonify(result)
     
     @app.route('/api/get-skills', methods=['POST'])
+    @auth.login_required
     def run_skills():
         data = request.get_json()
 
@@ -73,6 +92,7 @@ def init_routes(app):
     
     # Save competencies to database
     @app.route('/api/save-competencies', methods=['POST'])
+    @auth.login_required
     def save_competencies():
 
         try:
