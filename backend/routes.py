@@ -28,7 +28,7 @@ def init_routes(app):
     # Set up basic authentication
     auth = HTTPBasicAuth()
     users = {
-        os.getenv("BACKEND_USERNAME"): os.getenv("BACKEND_PASSWORD")
+        os.getenv("BACKEND_USERNAME"): generate_password_hash(os.getenv("BACKEND_PASSWORD"))
     }
 
     @auth.verify_password
