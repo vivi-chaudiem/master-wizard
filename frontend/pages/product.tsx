@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Spinner } from '@chakra-ui/react'
 import StepperComponent from '../components/StepperComponent';
-import { Button, Box, Textarea } from '@chakra-ui/react';
+import { Button, Box, Textarea, Text } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import LoaderComponent from '../components/LoaderComponent';
 import { toggleArrayValue } from '../utils/utils';
@@ -9,7 +9,7 @@ import { AdditionalContext } from 'context/additionalcontext';
 
 const ProductPage = () => {
   const [productInput, setProductInput] = useState('');
-  const { additionalCompanyInfo, setAdditionalCompanyInfo, additionalProductInfo, setAdditionalProductInfo } = useContext(AdditionalContext);
+  const { additionalCompanyInfo, setAdditionalCompanyInfo, additionalProductInfo, setAdditionalProductInfo, additionalRolesInfo, setAdditionalRolesInfo } = useContext(AdditionalContext);
   const [apiResponse, setApiResponse] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [clickedSteps, setClickedSteps] = useState<number[]>([]);
@@ -100,53 +100,55 @@ const ProductPage = () => {
             <StepperComponent activeIndex={activeStepIndex} />
         </div>        
 
-        <form onSubmit={handleSubmit} className="mb-4">
-            <div className="flex flex-col">
-                <label htmlFor="productInput" className="text-4xl font-semibold mb-8">
-                    Welches Produkt wird in dem Werk produziert?
-                </label>
-                <input
-                    type="text"
-                    id="productInput"
-                    name="productInput"
-                    value={productInput}
-                    onChange={(e) => handleInputChange(e, setProductInput)}
-                    className="bg-white border border-gray-200 text-gray-900 text-lg rounded-md focus:ring-2 focus:ring-ring-color focus:ring-offset-0 focus:border-ring-color focus:outline-none shadow-sm p-3 mb-2"
-                    placeholder="Konkreten Produktnamen eingeben"
-                    required
-                />
-                <div className="mt-10">
-                  <label className="text-xl font-semibold">
-                    Optional: Zusätzliche Informationen zu der Firma:
-                  </label><br></br>
-                  <Textarea mt='15px'
-                    value={additionalCompanyInfo}
-                    onChange={(e) => handleInputChange(e, setAdditionalCompanyInfo)}
-                    placeholder="Zusätzliche Informationen zu der Firma hinzufügen"
+        {!apiResponse && (
+          <form onSubmit={handleSubmit} className="mb-4">
+              <div className="flex flex-col">
+                  <label htmlFor="productInput" className="text-4xl font-semibold mb-8">
+                      Welches Produkt wird in dem Werk produziert?
+                  </label>
+                  <input
+                      type="text"
+                      id="productInput"
+                      name="productInput"
+                      value={productInput}
+                      onChange={(e) => handleInputChange(e, setProductInput)}
+                      className="bg-white border border-gray-200 text-gray-900 text-lg rounded-md focus:ring-2 focus:ring-ring-color focus:ring-offset-0 focus:border-ring-color focus:outline-none shadow-sm p-3 mb-2"
+                      placeholder="Konkreten Produktnamen eingeben"
+                      required
                   />
-                </div>
-                <div className="mt-10">
-                  <label className="text-xl font-semibold">
-                    Optional: Zusätzliche Informationen zu dem Produkt:
-                  </label><br></br>
-                  <Textarea mt='15px' mb='15px'
-                    value={additionalProductInfo}
-                    onChange={(e) => handleInputChange(e, setAdditionalProductInfo)}
-                    placeholder="Zusätzliche Informationen zu dem Produkt hinzufügen"
-                  />
-                </div>
-                {!apiResponse && (
-                  <div className="flex justify-end mb-2">
-                  <button
-                      type="submit"
-                      className="bg-blue-950 hover:bg-hover-color text-white font-bold py-2 px-4 rounded-md"
-                      >
-                      Bestätigen
-                  </button>
+                  <div className="mt-10">
+                    <label className="text-xl font-semibold">
+                      Optional: Zusätzliche Informationen zu der Firma:
+                    </label><br></br>
+                    <Textarea mt='15px'
+                      value={additionalCompanyInfo}
+                      onChange={(e) => handleInputChange(e, setAdditionalCompanyInfo)}
+                      placeholder="Zusätzliche Informationen zu der Firma hinzufügen"
+                    />
                   </div>
-                )}
-            </div>
-        </form>
+                  <div className="mt-10">
+                    <label className="text-xl font-semibold">
+                      Optional: Zusätzliche Informationen zu dem Produkt:
+                    </label><br></br>
+                    <Textarea mt='15px' mb='15px'
+                      value={additionalProductInfo}
+                      onChange={(e) => handleInputChange(e, setAdditionalProductInfo)}
+                      placeholder="Zusätzliche Informationen zu dem Produkt hinzufügen"
+                    />
+                  </div>
+                  {!apiResponse && (
+                    <div className="flex justify-end mb-2">
+                    <button
+                        type="submit"
+                        className="bg-blue-950 hover:bg-hover-color text-white font-bold py-2 px-4 rounded-md"
+                        >
+                        Bestätigen
+                    </button>
+                    </div>
+                  )}
+              </div>
+          </form>
+        )}
 
         {isLoading && !apiResponse && (
             <LoaderComponent />
@@ -158,6 +160,7 @@ const ProductPage = () => {
             <div className="grid-answer-box">
             {apiResponse.split('\n').map((step, index: number) => (
                 <Button
+                height="auto"
                 key={index}
                 onClick={() => handleButtonClick(index)}
                 sx={{
@@ -185,6 +188,17 @@ const ProductPage = () => {
                 placeholder="Weitere Schritte hinzufügen"
               />
             </div>
+
+            <div className="mt-10">
+                    <label className="text-xl font-semibold">
+                      Optional: Im nächsten Schritt werden Rollen für die Produktionsschritte vorgeschlagen. Bei Bedarf füge zusätzlichen Kontext zu den Rollen hinzu:
+                    </label><br></br>
+                    <Textarea mt='15px' mb='15px'
+                      value={additionalRolesInfo}
+                      onChange={(e) => handleInputChange(e, setAdditionalRolesInfo)}
+                      placeholder="Zusätzlichen Kontext zu den Rollen hinzufügen"
+                    />
+                  </div>
 
             <div className="flex justify-end">
                 <button

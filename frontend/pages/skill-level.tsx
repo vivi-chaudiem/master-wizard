@@ -10,7 +10,7 @@ const SkillLevelPage = () => {
   const router = useRouter();
   const activeStepIndex = 3;
   const { selectedSkills, setSelectedSkills } = useContext(SkillsContext);
-  const { additionalCompanyInfo, setAdditionalCompanyInfo, additionalProductInfo, setAdditionalProductInfo } = useContext(AdditionalContext);
+  const { additionalCompanyInfo, setAdditionalCompanyInfo, additionalProductInfo, setAdditionalProductInfo, setAdditionalRolesInfo } = useContext(AdditionalContext);
   const [error, setError] = useState('');
 
   const handleLevelChange = (roleIndex, category, skillIndex, value) => {
@@ -51,6 +51,7 @@ const SkillLevelPage = () => {
         setAdditionalCompanyInfo('');
         setAdditionalProductInfo('');
         setSelectedSkills([]);
+        setAdditionalRolesInfo('');
 
         console.log('Save successful:', result);
         router.push('/success');

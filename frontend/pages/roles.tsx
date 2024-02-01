@@ -14,7 +14,7 @@ interface ArbeitsschrittRolle {
 const RolesPage = () => {
   const router = useRouter();
   const [apiResponse, setApiResponse] = useState<ArbeitsschrittRolle[]>([]);
-  const { additionalCompanyInfo, setAdditionalCompanyInfo, additionalProductInfo, setAdditionalProductInfo } = useContext(AdditionalContext);
+  const { additionalCompanyInfo, setAdditionalCompanyInfo, additionalProductInfo, setAdditionalProductInfo, additionalRolesInfo } = useContext(AdditionalContext);
   const [newArbeitsschritt, setNewArbeitsschritt] = useState('');
   const [newRolle, setNewRolle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -67,6 +67,7 @@ const RolesPage = () => {
             production_steps: production_steps,
             additionalCompanyInfo: additionalCompanyInfo,
             additionalProductInfo: additionalProductInfo,
+            additionalRolesInfo: additionalRolesInfo,
           }),
         });
   
@@ -104,31 +105,6 @@ const RolesPage = () => {
           steps_and_roles_string: JSON.stringify(apiResponse),
     }});
   }
-
-//   const handleConfirmClick = () => {
-//     if (apiResponse) {
-//       const selectedRoles = clickedRoles.map((index) => {
-//           const stepText = apiResponse.split('\n')[index];
-//           return stepText.replace(/^\d+\.\s*/, '').trim();
-//       });
-      
-//       // Add the additional step if it's not empty
-//       if (additionalRole.trim() !== '') {
-//         selectedRoles.push(additionalRole.trim());
-//       }
-
-//       router.push({
-//           pathname: '/skills',
-//           query: {
-//             product: router.query.product,
-//             production_steps: router.query.clickedSteps, 
-//             roles: JSON.stringify(selectedRoles),
-//       }});
-
-//   } else {
-//       console.error('apiResponse is null');
-//   }
-// };
 
 const renderSkills = () => {
   if (error) {
@@ -174,7 +150,6 @@ const renderSkills = () => {
                 mr="2"
               />
               <Button
-                flex="1"
                 onClick={handleAdd}
               >
                 Hinzufügen
@@ -202,12 +177,13 @@ const renderSkills = () => {
           {renderSkills()}
 
           <div className="flex justify-end">
-            <button
+            <Button
+              height="auto"
               onClick={handleConfirmClick}
 
               className="bg-blue-950 hover:bg-hover-color text-white font-bold py-2 px-4 rounded-md mt-4">
               Bestätigen
-            </button>
+            </Button>
           </div>
       </Box>
       )}
