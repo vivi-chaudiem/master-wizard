@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import StepperComponent from '../components/StepperComponent';
 import LoaderComponent from '../components/LoaderComponent';
 import { useRouter } from 'next/router';
 import { Box, Button, Table, Thead, Tr, Th, Tbody, Td, Input, TableContainer, Flex  } from '@chakra-ui/react';
 import { toggleArrayValue } from '../utils/utils';
+import { AdditionalContext } from 'context/additionalcontext';
 
 interface ArbeitsschrittRolle {
   Arbeitsschritt: string;
@@ -13,6 +14,7 @@ interface ArbeitsschrittRolle {
 const RolesPage = () => {
   const router = useRouter();
   const [apiResponse, setApiResponse] = useState<ArbeitsschrittRolle[]>([]);
+  const { additionalCompanyInfo, setAdditionalCompanyInfo, additionalProductInfo, setAdditionalProductInfo } = useContext(AdditionalContext);
   const [newArbeitsschritt, setNewArbeitsschritt] = useState('');
   const [newRolle, setNewRolle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -63,6 +65,8 @@ const RolesPage = () => {
           body: JSON.stringify({
             product: product,
             production_steps: production_steps,
+            additionalCompanyInfo: additionalCompanyInfo,
+            additionalProductInfo: additionalProductInfo,
           }),
         });
   

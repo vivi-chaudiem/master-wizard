@@ -62,7 +62,9 @@ def init_routes(app):
         data = request.json
         product = data.get('product')
         production_steps = data.get('production_steps')
-        result = run_roles_chain(llm, product, production_steps, json_template)
+        additionalCompanyInfo = data.get('additionalCompanyInfo')
+        additionalProductInfo = data.get('additionalProductInfo')
+        result = run_roles_chain(llm, product, production_steps, json_template, additionalCompanyInfo, additionalProductInfo)
         return jsonify(result)
     
     @app.route('/api/get-skills', methods=['POST'])

@@ -1,5 +1,6 @@
 import { Box, Button, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import StepperComponent from "components/StepperComponent";
+import { AdditionalContext } from "context/additionalcontext";
 import { SkillsContext } from "context/skillscontext";
 import { useRouter } from "next/router";
 import React from "react";
@@ -9,6 +10,7 @@ const SkillLevelPage = () => {
   const router = useRouter();
   const activeStepIndex = 3;
   const { selectedSkills, setSelectedSkills } = useContext(SkillsContext);
+  const { additionalCompanyInfo, setAdditionalCompanyInfo, additionalProductInfo, setAdditionalProductInfo } = useContext(AdditionalContext);
   const [error, setError] = useState('');
 
   const handleLevelChange = (roleIndex, category, skillIndex, value) => {
@@ -44,6 +46,11 @@ const SkillLevelPage = () => {
         if (!response.ok) {
             throw new Error(result.message || `Error: ${response.status}`);
         }
+
+        // Reset values from context
+        setAdditionalCompanyInfo('');
+        setAdditionalProductInfo('');
+        setSelectedSkills([]);
 
         console.log('Save successful:', result);
         router.push('/success');

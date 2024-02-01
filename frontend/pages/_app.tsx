@@ -3,13 +3,16 @@ import '../styles/globals.css';
 import { ChakraProvider } from '@chakra-ui/react';
 import customTheme from '../styles/theme';
 import { SkillsProvider } from 'context/skillscontext';
+import { AdditionalContextProvider } from 'context/additionalcontext';
 
 function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider theme={customTheme}>
-      <SkillsProvider>
-        <Component {...pageProps} />
-      </SkillsProvider>
+      <AdditionalContextProvider>
+        <SkillsProvider>
+            <Component {...pageProps} />
+        </SkillsProvider>
+      </AdditionalContextProvider>
     </ChakraProvider>
   )
 }

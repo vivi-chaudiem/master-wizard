@@ -1,16 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Spinner } from '@chakra-ui/react'
 import StepperComponent from '../components/StepperComponent';
 import { Button, Box, Textarea } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import LoaderComponent from '../components/LoaderComponent';
 import { toggleArrayValue } from '../utils/utils';
-
+import { AdditionalContext } from 'context/additionalcontext';
 
 const ProductPage = () => {
   const [productInput, setProductInput] = useState('');
-  const [additionalCompanyInfo, setAdditionalCompanyInfo] = useState('');
-  const [additionalProductInfo, setAdditionalProductInfo] = useState('');
+  const { additionalCompanyInfo, setAdditionalCompanyInfo, additionalProductInfo, setAdditionalProductInfo } = useContext(AdditionalContext);
   const [apiResponse, setApiResponse] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [clickedSteps, setClickedSteps] = useState<number[]>([]);
@@ -48,6 +47,9 @@ const ProductPage = () => {
           additionalProductInfo: additionalProductInfo
         }),
       });
+
+      console.log('additonalCompanyInfo:', additionalCompanyInfo);
+      console.log('additonalProductInfo:', additionalProductInfo);
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
