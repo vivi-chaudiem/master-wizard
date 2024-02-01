@@ -161,6 +161,7 @@ const ProductPage = () => {
                 sx={{
                   backgroundColor: clickedSteps.includes(index) ? '#0c4a6e' : '',
                   color: clickedSteps.includes(index) ? 'white' : 'black',
+                  flex: '1'
                 }}
               >
                 {step}
