@@ -54,6 +54,7 @@ const ProductPage = () => {
       }
 
       const data = await response.json();
+      console.log('Received data:', data);
       setApiResponse(data);
     } catch (err: unknown) {
         if (err instanceof Error) {
