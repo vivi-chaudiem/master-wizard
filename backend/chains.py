@@ -12,7 +12,7 @@ def run_production_steps_chain(llm, product, additionalCompanyInfo, additionalPr
     print(existing_prod_steps)
 
     # Ask for new production steps
-    template = "Welche Fertigungslinien bzw. Arbeitsschritte könnten in der Produktion des Produkts {product} auftreten? Anbei zusätzliche Informationen zu dem Produkt: {additionalProductInfo}. Außerdem zusätzliche Informationen zu der Firma um die es geht: {additionalCompanyInfo}. Deine Antwort sollte mit '1.', '2.', '3.', etc. beginnen. Beachte, dass die Liste möglicher Arbeitsschritte nicht auf die in der übergebenen Liste enthaltenen beschränkt ist. Falls es semantische Überschneidungen mit den folgenden Begriffen gibt, passe deine Formulierung entsprechend an, um Dopplungen zu vermeiden: {existing_prod_steps} Bitte gib eine Liste ohne zusätzliche Erklärungen aus."
+    template = "Welche Fertigungslinien bzw. Arbeitsschritte könnten in der Produktion des Produkts {product} auftreten? Anbei zusätzliche Informationen zu dem Produkt: {additionalProductInfo}. Außerdem zusätzliche Informationen zu der Firma um die es geht: {additionalCompanyInfo}. Deine Antwort sollte mit '1.', '2.', '3.', etc. beginnen. Falls es semantische Überschneidungen mit den folgenden Begriffen gibt, passe deine Formulierung entsprechend an, um Dopplungen zu vermeiden: {existing_prod_steps} Beachte, dass die Liste möglicher Arbeitsschritte nicht auf die in der übergebenen Liste enthaltenen beschränkt ist. Bitte gib eine Liste ohne zusätzliche Erklärungen aus."
 
     formatted_template = template.format(
         product=product,
@@ -27,6 +27,8 @@ def run_production_steps_chain(llm, product, additionalCompanyInfo, additionalPr
         )
     
     chain = LLMChain(llm=llm, prompt=prompt)
+
+    print(prompt)
 
     return chain.run({"product": product, "additionalProductInfo": additionalProductInfo, "additionalCompanyInfo": additionalCompanyInfo, "existing_prod_steps": existing_prod_steps})
 
