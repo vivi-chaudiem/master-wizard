@@ -93,7 +93,7 @@ const RolesPage = () => {
     };
   
     fetchData();
-  }, [router.query]);  
+  }, [router.query, additionalCompanyInfo, additionalProductInfo, additionalRolesInfo]);  
 
   const handleConfirmClick = () => {
     console.log("Letzte apiResponse:", apiResponse);
