@@ -199,13 +199,15 @@ const SkillsPage = () => {
   }, [router.query]);
 
   const renderSkills = () => {
-    if (isLoading) {
-      return <LoaderComponent />;
-    }
+    // if (isLoading) {
+    //   return <LoaderComponent />;
+    // }
   
     if (error) {
       return <div className="text-red-500">Error: {error}</div>;
     }
+
+    console.log('apiResponseObj in renderSkills:', apiResponseObj)
   
     return (
       <div>
