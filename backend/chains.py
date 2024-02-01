@@ -6,27 +6,29 @@ from dbmodels import Role, Competency
 import json
 
 # Production steps chain
-def run_production_steps_chain(llm, product):
+def run_production_steps_chain(llm, product, additionalCompanyInfo, additionalProductInfo):
     ## Get existing production steps from the DB first
     existing_prod_steps = db.session.execute(db.select(Role.arbeitsschritt)).scalars().all()
     print(existing_prod_steps)
 
     # Ask for new production steps
-    template = "Welche Fertigungslinien bzw. Arbeitsschritte könnten in der Produktion des Produkts {product} auftreten? Deine Antwort sollte mit '1.', '2.', '3.', etc. beginnen. Beachte, dass die Liste möglicher Arbeitsschritte nicht auf die in der übergebenen Liste enthaltenen beschränkt ist. Falls es semantische Überschneidungen mit den folgenden Begriffen gibt, passe deine Formulierung entsprechend an, um Dopplungen zu vermeiden: {existing_prod_steps} Bitte gib eine Liste ohne zusätzliche Erklärungen aus."
+    template = "Welche Fertigungslinien bzw. Arbeitsschritte könnten in der Produktion des Produkts {product} auftreten? Anbei zusätzliche Informationen zu dem Produkt: {additionalProductInfo}. Außerdem zusätzliche Informationen zu der Firma um die es geht: {additionalCompanyInfo}. Deine Antwort sollte mit '1.', '2.', '3.', etc. beginnen. Beachte, dass die Liste möglicher Arbeitsschritte nicht auf die in der übergebenen Liste enthaltenen beschränkt ist. Falls es semantische Überschneidungen mit den folgenden Begriffen gibt, passe deine Formulierung entsprechend an, um Dopplungen zu vermeiden: {existing_prod_steps} Bitte gib eine Liste ohne zusätzliche Erklärungen aus."
 
     formatted_template = template.format(
         product=product,
+        additionalProductInfo=additionalProductInfo,
+        additionalCompanyInfo=additionalCompanyInfo,
         existing_prod_steps=existing_prod_steps
         )
 
     prompt = PromptTemplate(
-        input_variables=["product", "existing_prod_steps"], 
+        input_variables=["product", "additionalProductInfo", "additionalCompanyInfo", "existing_prod_steps"], 
         template=formatted_template
         )
     
     chain = LLMChain(llm=llm, prompt=prompt)
 
-    return chain.run({"product": product, "existing_prod_steps": existing_prod_steps})
+    return chain.run({"product": product, "additionalProductInfo": additionalProductInfo, "additionalCompanyInfo": additionalCompanyInfo, "existing_prod_steps": existing_prod_steps})
 
 # Roles chain
 def run_roles_chain(llm, product, production_steps, json_template):

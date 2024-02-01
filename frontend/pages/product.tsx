@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { Spinner } from '@chakra-ui/react'
 import StepperComponent from '../components/StepperComponent';
-import { Button, Box, Progress } from '@chakra-ui/react';
+import { Button, Box, Textarea } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import LoaderComponent from '../components/LoaderComponent';
 import { toggleArrayValue } from '../utils/utils';
 
 
 const ProductPage = () => {
-  const [inputValue, setInputValue] = useState('');
+  const [productInput, setProductInput] = useState('');
+  const [additionalCompanyInfo, setAdditionalCompanyInfo] = useState('');
+  const [additionalProductInfo, setAdditionalProductInfo] = useState('');
   const [apiResponse, setApiResponse] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [clickedSteps, setClickedSteps] = useState<number[]>([]);
@@ -22,8 +24,11 @@ const ProductPage = () => {
     setClickedSteps((prev) => toggleArrayValue(prev, index));
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    targetStateSetter: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    targetStateSetter(e.target.value);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -38,7 +43,9 @@ const ProductPage = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          product: inputValue 
+          product: productInput,
+          additionalCompanyInfo: additionalCompanyInfo,
+          additionalProductInfo: additionalProductInfo
         }),
       });
 
@@ -55,10 +62,6 @@ const ProductPage = () => {
             setError('Unbekannter Fehler!');
           }
     }
-  };
-
-  const handleAdditionalStepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAdditionalStep(e.target.value);
   };
 
   const handleConfirmClick = () => {
@@ -78,7 +81,7 @@ const ProductPage = () => {
       router.push({
           pathname: '/roles',
           query: {
-              product: inputValue,
+              product: productInput,
               clickedSteps: JSON.stringify(selectedSteps),
           },
       });
@@ -86,7 +89,6 @@ const ProductPage = () => {
       console.error('apiResponse is null');
   }
 };
-
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-10">
@@ -104,12 +106,32 @@ const ProductPage = () => {
                     type="text"
                     id="productInput"
                     name="productInput"
-                    value={inputValue}
-                    onChange={handleInputChange}
+                    value={productInput}
+                    onChange={(e) => handleInputChange(e, setProductInput)}
                     className="bg-white border border-gray-200 text-gray-900 text-lg rounded-md focus:ring-2 focus:ring-ring-color focus:ring-offset-0 focus:border-ring-color focus:outline-none shadow-sm p-3 mb-2"
                     placeholder="Konkreten Produktnamen eingeben"
                     required
                 />
+                <div className="mt-10">
+                  <label className="text-xl font-semibold">
+                    Optional: Zusätzliche Informationen zu der Firma:
+                  </label><br></br>
+                  <Textarea mt='15px'
+                    value={additionalCompanyInfo}
+                    onChange={(e) => handleInputChange(e, setAdditionalCompanyInfo)}
+                    placeholder="Zusätzliche Informationen zu der Firma hinzufügen"
+                  />
+                </div>
+                <div className="mt-10">
+                  <label className="text-xl font-semibold">
+                    Optional: Zusätzliche Informationen zu dem Produkt:
+                  </label><br></br>
+                  <Textarea mt='15px' mb='15px'
+                    value={additionalProductInfo}
+                    onChange={(e) => handleInputChange(e, setAdditionalProductInfo)}
+                    placeholder="Zusätzliche Informationen zu dem Produkt hinzufügen"
+                  />
+                </div>
                 {!apiResponse && (
                   <div className="flex justify-end mb-2">
                   <button
@@ -154,7 +176,7 @@ const ProductPage = () => {
                 id="additionalStep"
                 name="additionalStep"
                 value={additionalStep}
-                onChange={handleAdditionalStepChange}
+                onChange={(e) => handleInputChange(e, setAdditionalStep)}
                 className="free-text-field mt-4 w-full resize-y"
                 placeholder="Weitere Schritte hinzufügen"
               />

@@ -46,7 +46,9 @@ def init_routes(app):
     def run_production():
         data = request.json
         product = data.get('product')
-        result = run_production_steps_chain(llm, product)
+        additionalCompanyInfo = data.get('additionalCompanyInfo')
+        additionalProductInfo = data.get('additionalProductInfo')
+        result = run_production_steps_chain(llm, product, additionalCompanyInfo, additionalProductInfo)
         return jsonify(result)
     
     @app.route('/api/get-roles', methods=['POST'])
