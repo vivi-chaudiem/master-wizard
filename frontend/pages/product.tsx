@@ -176,7 +176,7 @@ const ProductPage = () => {
 
             <div className="mt-10">
               <label htmlFor="additionalStep" className="text-xl font-semibold">
-                Weitere Produktionsschritte (optional):
+                Optional: Weitere Produktionsschritte:
               </label><br></br>
               <input
                 type="text"

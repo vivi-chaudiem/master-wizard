@@ -113,7 +113,7 @@ const renderSkills = () => {
 
   return (
     <div>
-      <Box>
+      <Box overflowX="auto">
         <TableContainer>
           <Table variant="simple">
             <Thead>
@@ -126,9 +126,9 @@ const renderSkills = () => {
             <Tbody>
               {apiResponse.map((item, index) => (
                 <Tr key={index}>
-                  <Td>{item.Arbeitsschritt}</Td>
-                  <Td>{item.Rolle}</Td>
-                  <Td><Button onClick={() => handleRemoveRole(index)}>x</Button></Td>
+                  <Td whiteSpace="normal">{item.Arbeitsschritt}</Td>
+                  <Td whiteSpace="normal">{item.Rolle}</Td>
+                  <Td whiteSpace="normal"><Button onClick={() => handleRemoveRole(index)}>x</Button></Td>
                 </Tr>
               ))}
             </Tbody>

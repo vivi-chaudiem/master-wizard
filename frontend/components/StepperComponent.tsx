@@ -4,7 +4,7 @@ import { useSteps, Stepper, Step, StepIndicator, StepStatus, StepIcon, StepNumbe
 
 const steps = [
   { title: 'Produkt', description: 'Produktionsschritte' },
-  { title: 'Rollen', description: 'Pro Produktionsschritt' },
+  { title: 'Rollen', description: 'Pro Schritt' },
   { title: 'Fähigkeiten', description: 'Max. Level' },
   { title: 'Fähigkeiten', description: 'Soll-Level' },
   { title: 'Fertig!', description: 'Datenspeicherung' },
