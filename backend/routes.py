@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -97,8 +97,13 @@ def init_routes(app):
 
         result = run_skills_chain(llm, product, escaped_steps_and_roles_string, background_info, json_template)
         print(result)
-        return jsonify(result)
-    
+
+        response = make_response(jsonify(result))
+        response.headers['Content-Type'] = 'application/json; charset=utf-8'
+
+        return response
+        
+
     # Save competencies to database
     @app.route('/api/save-competencies', methods=['POST'])
     @auth.login_required
