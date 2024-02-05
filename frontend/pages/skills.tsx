@@ -129,99 +129,6 @@ const SkillsPage = () => {
   useEffect(() => {
     const product = router.query.product;
     const steps_and_roles_string = router.query.steps_and_roles_string;
-    // const production_steps = router.query.production_steps;
-    // const roles = Array.isArray(router.query.roles)
-    // ? JSON.parse(router.query.roles[0])
-    // : router.query.roles
-    // ? JSON.parse(router.query.roles)
-    // : [];
-
-    // const fetchData = async () => {
-    //   setIsLoading(true);
-    //   try {
-    //     const response = await fetch('/api/get-skills', {
-    //       method: 'POST',
-    //       headers: {
-    //         'Content-Type': 'application/json',
-    //       },
-    //       body: JSON.stringify({
-    //         product: product,
-    //         steps_and_roles_string: steps_and_roles_string
-    //       })
-    //     });
-
-    //     const data = await response.json();
-    //     console.log('Data from fetchData:', data);
-    //     // setApiResponse(data);
-    //     const parsedData = JSON.parse(data);
-
-    //     const transformedData = parsedData.map(item => ({
-    //     ...item,
-    //     Kompetenzen: Object.fromEntries(
-    //       Object.entries(item.Kompetenzen).map(([category, skillNames]): [string, Skill[]] => [
-    //         category, 
-    //         (skillNames as string[]).map(skillName => ({ 
-    //           bezeichnung: skillName, 
-    //           maxlevel: '4', // Default value for maxlevel
-    //           targetlevel: '0' // Default value for targetlevel
-    //         }))
-    //       ])
-    //     )
-    //   }));
-
-    //   setApiResponseObj(transformedData);
-    //   setIsLoading(false);
-      
-
-    //   // const transformItem = async (item) => {
-    //   //   const transformedItem = {
-    //   //     ...item,
-    //   //     Kompetenzen: Object.fromEntries(
-    //   //       await Promise.all(
-    //   //         Object.entries(item.Kompetenzen).map(async ([category, skillNames]) => [
-    //   //           category,
-    //   //           await Promise.all(
-    //   //             (skillNames as string[]).map(async (skillName) => ({
-    //   //               bezeichnung: skillName,
-    //   //               maxlevel: '4',
-    //   //               targetlevel: '0',
-    //   //             }))
-    //   //           ),
-    //   //         ])
-    //   //       )
-    //   //     ),
-    //   //   };
-    //   //   return transformedItem;
-    //   // };
-
-    //   // // Use Promise.all to transform all items in parallel
-    //   // const transformedData = await Promise.all(parsedData.map(transformItem));
-
-    //   setApiResponseObj(transformedData);
-    //   console.log('transformedData:', transformedData);
-
-    //     // Initialize newSkillStates for each role
-    //     const initialSkillStates = {};
-    //     parsedData.forEach((_, index) => {
-    //       initialSkillStates[index] = {
-    //         newSkillLevel: '4',
-    //         newSkillCategory: '',
-    //         newSkillName: '',
-    //         addingNewSkill: false
-    //       };
-    //     });
-    //     setNewSkillStates(initialSkillStates);
-
-    //     setIsLoading(false);
-    //   } catch (err: unknown) {
-    //     if (err instanceof Error) {
-    //         setError(err.message);
-    //       } else {
-    //         setError('Unbekannter Fehler!');
-    //       }
-    //   }
-
-    // }
 
     const transformData = (parsedData) => {
       return parsedData.map(item => ({
@@ -254,51 +161,17 @@ const SkillsPage = () => {
         });
     
         const data = await response.json();
-        console.log('Data from fetchData:', data);
-    
-        // Assuming `data` needs to be parsed if it's a JSON string, otherwise use directly
-        // const isValidJSON = (data) => {
-        //   try {
-        //     JSON.parse(data);
-        //     return true;
-        //   } catch (e) {
-        //     return false;
-        //   }
-        // };
-        
-        // // Check if data is valid JSON
-        // if (isValidJSON(data)) {
-        //   const parsedData = JSON.parse(data);
-        //   console.log('Data from parsedData:', parsedData);
-
-        //   const transformedData = transformData(parsedData);
-        //   console.log('Transformed Data:', transformedData);
-        //   setApiResponseObj(transformedData);
-        //   // Continue processing parsedData
-        // } else {
-        //   console.error('Invalid JSON data:', data);
-        //   // Handle the error appropriately
-        // }
-        
-        // const parsedData = JSON.parse(JSON.stringify(data));
-        // console.log('Data from parsedData:', parsedData);
 
         if (!Array.isArray(data)) {
-          console.error('Data is not an array:', data);
+          // console.error('Data is not an array:', data);
           const parsedData = JSON.parse(data);
-          console.log('Data from parsedData:', parsedData);
           const transformedData = transformData(parsedData);
-          console.log('Transformed Data:', transformedData);
           setApiResponseObj(transformedData);
         } else {
           const transformedData = transformData(data);
-          console.log('Transformed Data:', transformedData);
           setApiResponseObj(transformedData);
         }
     
-        // const transformedData = transformData(parsedData);
-        // console.log('Transformed Data:', transformedData);
-        // setApiResponseObj(transformedData);
       } catch (error) {
         console.error('Fetching error:', error);
         setError('An error occurred while fetching data.');
@@ -312,15 +185,10 @@ const SkillsPage = () => {
   }, [router.query]);
 
   const renderSkills = () => {
-    // if (isLoading) {
-    //   return <LoaderComponent />;
-    // }
   
     if (error) {
       return <div className="text-red-500">Error: {error}</div>;
     }
-
-    console.log('apiResponseObj in renderSkills:', apiResponseObj)
   
     return (
       <div>
@@ -438,7 +306,6 @@ const SkillsPage = () => {
   };
 
   const handleConfirm = () => {
-    console.log('apiResponseObj:', apiResponseObj);
     setSelectedSkills(apiResponseObj);
 
     router.push('/skill-level');

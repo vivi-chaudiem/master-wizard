@@ -48,15 +48,12 @@ const ProductPage = () => {
         }),
       });
 
-      console.log('additonalCompanyInfo:', additionalCompanyInfo);
-      console.log('additonalProductInfo:', additionalProductInfo);
-
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log('Received data:', data);
+      // console.log('Received data:', data);
       setApiResponse(data);
     } catch (err: unknown) {
         if (err instanceof Error) {
@@ -69,7 +66,6 @@ const ProductPage = () => {
 
   const handleConfirmClick = () => {
     if (apiResponse) {
-      // Get the text of the clicked steps
       const selectedSteps = clickedSteps.map((index) => {
           const stepText = apiResponse.split('\n')[index];
           return stepText.replace(/^\d+\.\s*/, '').trim();
@@ -80,7 +76,6 @@ const ProductPage = () => {
           selectedSteps.push(additionalStep.trim());
       }
 
-      // Navigate to the /roles page with the combined steps
       router.push({
           pathname: '/roles',
           query: {

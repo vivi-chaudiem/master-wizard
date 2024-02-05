@@ -80,7 +80,6 @@ const RolesPage = () => {
         const sortedData = sortApiResponse(parsedData);
         setApiResponse(sortedData);
   
-        console.log("Neue Antwort:", data);
       } catch (err: unknown) {
         if (err instanceof Error) {
           setError(err.message);
@@ -96,7 +95,6 @@ const RolesPage = () => {
   }, [router.query, additionalCompanyInfo, additionalProductInfo, additionalRolesInfo]);  
 
   const handleConfirmClick = () => {
-    console.log("Letzte apiResponse:", apiResponse);
 
     router.push({
         pathname: '/skills',

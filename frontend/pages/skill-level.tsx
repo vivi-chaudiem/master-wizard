@@ -40,8 +40,6 @@ const SkillLevelPage = () => {
           body: JSON.stringify(selectedSkills)
         });
 
-        console.log('Sent body:', selectedSkills);
-
         const result = await response.json();
         if (!response.ok) {
             throw new Error(result.message || `Error: ${response.status}`);
@@ -53,7 +51,7 @@ const SkillLevelPage = () => {
         setSelectedSkills([]);
         setAdditionalRolesInfo('');
 
-        console.log('Save successful:', result);
+        // console.log('Save successful:', result);
         router.push('/success');
 
       } catch (error: unknown) {
