@@ -19,11 +19,6 @@ pymysql.install_as_MySQLdb()
 def create_app():
     app = Flask(__name__)
 
-    # Set up database
-    # basedir = os.path.abspath(os.path.dirname(__file__))
-
-    # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'wizard-database.db')
-    # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     # Load environment variables
     dotenv.load_dotenv()
 
@@ -36,7 +31,7 @@ def create_app():
     # Debug
     with app.app_context():
         try:
-            # db.drop_all()
+            db.drop_all()
             db.create_all()
             print("Tables dropped and created successfully.")
         except Exception as e:
