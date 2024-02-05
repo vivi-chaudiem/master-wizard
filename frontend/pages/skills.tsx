@@ -257,12 +257,48 @@ const SkillsPage = () => {
         console.log('Data from fetchData:', data);
     
         // Assuming `data` needs to be parsed if it's a JSON string, otherwise use directly
-        const parsedData = JSON.parse(data);
-        console.log('Data from parsedData:', parsedData);
+        // const isValidJSON = (data) => {
+        //   try {
+        //     JSON.parse(data);
+        //     return true;
+        //   } catch (e) {
+        //     return false;
+        //   }
+        // };
+        
+        // // Check if data is valid JSON
+        // if (isValidJSON(data)) {
+        //   const parsedData = JSON.parse(data);
+        //   console.log('Data from parsedData:', parsedData);
 
-        const transformedData = transformData(parsedData);
-        console.log('Transformed Data:', transformedData);
-        setApiResponseObj(transformedData);
+        //   const transformedData = transformData(parsedData);
+        //   console.log('Transformed Data:', transformedData);
+        //   setApiResponseObj(transformedData);
+        //   // Continue processing parsedData
+        // } else {
+        //   console.error('Invalid JSON data:', data);
+        //   // Handle the error appropriately
+        // }
+        
+        // const parsedData = JSON.parse(JSON.stringify(data));
+        // console.log('Data from parsedData:', parsedData);
+
+        if (!Array.isArray(data)) {
+          console.error('Data is not an array:', data);
+          const parsedData = JSON.parse(data);
+          console.log('Data from parsedData:', parsedData);
+          const transformedData = transformData(parsedData);
+          console.log('Transformed Data:', transformedData);
+          setApiResponseObj(transformedData);
+        } else {
+          const transformedData = transformData(data);
+          console.log('Transformed Data:', transformedData);
+          setApiResponseObj(transformedData);
+        }
+    
+        // const transformedData = transformData(parsedData);
+        // console.log('Transformed Data:', transformedData);
+        // setApiResponseObj(transformedData);
       } catch (error) {
         console.error('Fetching error:', error);
         setError('An error occurred while fetching data.');
