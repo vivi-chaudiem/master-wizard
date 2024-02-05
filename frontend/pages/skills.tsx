@@ -151,6 +151,7 @@ const SkillsPage = () => {
         });
 
         const data = await response.json();
+        console.log('Data from fetchData:', data);
         // setApiResponse(data);
         const parsedData = JSON.parse(data);
 
@@ -183,14 +184,13 @@ const SkillsPage = () => {
         });
         setNewSkillStates(initialSkillStates);
 
+        setIsLoading(false);
       } catch (err: unknown) {
         if (err instanceof Error) {
             setError(err.message);
           } else {
             setError('Unbekannter Fehler!');
           }
-      } finally {
-        setIsLoading(false);
       }
 
     }
