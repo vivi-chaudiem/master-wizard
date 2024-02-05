@@ -155,19 +155,43 @@ const SkillsPage = () => {
         // setApiResponse(data);
         const parsedData = JSON.parse(data);
 
-        const transformedData = parsedData.map(item => ({
-        ...item,
-        Kompetenzen: Object.fromEntries(
-          Object.entries(item.Kompetenzen).map(([category, skillNames]): [string, Skill[]] => [
-            category, 
-            (skillNames as string[]).map(skillName => ({ 
-              bezeichnung: skillName, 
-              maxlevel: '4', // Default value for maxlevel
-              targetlevel: '0' // Default value for targetlevel
-            }))
-          ])
-        )
-      }));
+      //   const transformedData = parsedData.map(item => ({
+      //   ...item,
+      //   Kompetenzen: Object.fromEntries(
+      //     Object.entries(item.Kompetenzen).map(([category, skillNames]): [string, Skill[]] => [
+      //       category, 
+      //       (skillNames as string[]).map(skillName => ({ 
+      //         bezeichnung: skillName, 
+      //         maxlevel: '4', // Default value for maxlevel
+      //         targetlevel: '0' // Default value for targetlevel
+      //       }))
+      //     ])
+      //   )
+      // }));
+
+      const transformItem = async (item) => {
+        const transformedItem = {
+          ...item,
+          Kompetenzen: Object.fromEntries(
+            await Promise.all(
+              Object.entries(item.Kompetenzen).map(async ([category, skillNames]) => [
+                category,
+                await Promise.all(
+                  (skillNames as string[]).map(async (skillName) => ({
+                    bezeichnung: skillName,
+                    maxlevel: '4',
+                    targetlevel: '0',
+                  }))
+                ),
+              ])
+            )
+          ),
+        };
+        return transformedItem;
+      };
+
+      // Use Promise.all to transform all items in parallel
+      const transformedData = await Promise.all(parsedData.map(transformItem));
 
       setApiResponseObj(transformedData);
       console.log('transformedData:', transformedData);
