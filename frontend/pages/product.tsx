@@ -95,7 +95,7 @@ const ProductPage = () => {
             <StepperComponent activeIndex={activeStepIndex} />
         </div>        
 
-        {!apiResponse && (
+        {!isLoading && !apiResponse && (
           <form onSubmit={handleSubmit} className="mb-4">
               <div className="flex flex-col">
                   <label htmlFor="productInput" className="text-4xl font-semibold mb-8">
