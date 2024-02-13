@@ -9,7 +9,6 @@ import dotenv
 import os
 import openai
 import json
-import re
 
 from utils import read_file, read_json
 from dbextensions import db
@@ -172,19 +171,34 @@ def init_routes(app):
         
     return app
         
-def extract_valid_json(json_data):
-    # Regex to extract only the valid JSON
-    # Looks for the portion of the string that starts with '{' and ends with '}' or starts with '[' and ends with ']', capturing the longest possible match
-    json_regex = re.compile(r'(\{(?:[^{}]|(?R))*\}|\[(?:[^\[\]]|(?R))*\])')
+def find_json_boundaries(s):
+    open_chars = {'{': '}', '[': ']'}
+    close_chars = {v: k for k, v in open_chars.items()}
+    stack = []
+    start_index = -1
 
-    match = json_regex.search(json_data)
-    if match:
-        json_substring = match.group()
+    for i, char in enumerate(s):
+        if char in open_chars:
+            stack.append(char)
+            if start_index == -1:
+                start_index = i
+        elif char in close_chars and stack:
+            if stack[-1] == close_chars[char]:
+                stack.pop()
+                if not stack:
+                    return start_index, i + 1
+            else:
+                # Mismatched closing character
+                break
+    return None
 
+def extract_valid_json(s):
+    boundaries = find_json_boundaries(s)
+    if boundaries:
+        json_str = s[boundaries[0]:boundaries[1]]
         try:
-            json_object = json.loads(json_substring)
-            return json.dumps(json_object)
+            json_obj = json.loads(json_str)
+            return json.dumps(json_obj)  # Return a string representation of the JSON object
         except json.JSONDecodeError:
             pass
-
-    return None    
+    return None
