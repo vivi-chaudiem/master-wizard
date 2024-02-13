@@ -9,8 +9,9 @@ import dotenv
 import os
 import openai
 import json
+import re
 
-from utils import read_file, read_json
+from utils import read_json
 from dbextensions import db
 from dbmodels import Role, Competency
 
@@ -51,7 +52,13 @@ def init_routes(app):
         additionalProductInfo = data.get('additionalProductInfo')
         result = run_production_steps_chain(llm, product, additionalCompanyInfo, additionalProductInfo)
         print("Prompt Resultat:", result)
-        return jsonify(result)
+
+        # Cut off the result off to only get the numerated list
+        pattern = re.compile(r'^\d+\..*$', re.MULTILINE)
+        matches = pattern.findall(result)
+        numerated_list = '\n'.join(matches)
+        print("Numerierte Liste:", numerated_list)
+        return jsonify(numerated_list)
     
     @app.route('/api/get-roles', methods=['POST'])
     @auth.login_required

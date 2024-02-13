@@ -49,7 +49,7 @@ const ProductPage = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        throw new Error(`Error Message: ${response.status}`);
       }
 
       const data = await response.json();

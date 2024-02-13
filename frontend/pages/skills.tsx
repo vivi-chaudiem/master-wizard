@@ -171,14 +171,14 @@ const SkillsPage = () => {
             // const parsedData = JSON.parse(data);
             const transformedData = transformData(data);
             setApiResponseObj(transformedData);
-            console.log('Data is not an array. transformedData:', transformedData);
+            // console.log('Data is not an array. transformedData:', transformedData);
           } catch (error) {
             console.error('Error parsing JSON:', error);
           }
         } else {
           const transformedData = transformData(data);
           setApiResponseObj(transformedData);
-          console.log('Data is an array. transformedData:', transformedData);
+          // console.log('Data is an array. transformedData:', transformedData);
         }
     
       } catch (error) {
