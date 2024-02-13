@@ -24,7 +24,7 @@ def init_routes(app):
     # Set up OpenAI API
     llm = ChatOpenAI(
         openai_api_key=openai.api_key, 
-        model_name="gpt-3.5-turbo-1106"
+        model_name="gpt-3.5-turbo-0125"
         )
 
     # Set up basic authentication
