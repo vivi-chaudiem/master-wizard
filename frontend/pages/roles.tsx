@@ -22,6 +22,8 @@ const RolesPage = () => {
   const [error, setError] = useState('');
   const activeStepIndex = 1;
 
+  const uniqueArbeitsschritt = Array.from(new Set(apiResponse.map(item => item.Arbeitsschritt)));
+
   const handleButtonClick = (index) => {
     setClickedRoles((prev) => toggleArrayValue(prev, index));
   };
@@ -137,9 +139,15 @@ const renderSkills = () => {
                 placeholder="Arbeitsschritt"
                 value={newArbeitsschritt}
                 onChange={(e) => setNewArbeitsschritt(e.target.value)}
+                list="arbeitsschritt-options" // Associate the input with the datalist via the list attribute
                 flex="4"
                 mr="2"
               />
+              <datalist id="arbeitsschritt-options">
+                {uniqueArbeitsschritt.map((arbeitsschritt, index) => (
+                  <option key={index} value={arbeitsschritt} />
+                ))}
+              </datalist>
               <Input
                 placeholder="Rolle"
                 value={newRolle}
