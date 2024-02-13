@@ -139,7 +139,7 @@ const renderSkills = () => {
                 placeholder="Arbeitsschritt"
                 value={newArbeitsschritt}
                 onChange={(e) => setNewArbeitsschritt(e.target.value)}
-                list="arbeitsschritt-options" // Associate the input with the datalist via the list attribute
+                list="arbeitsschritt-options"
                 flex="4"
                 mr="2"
               />
