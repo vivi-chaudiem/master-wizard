@@ -10,6 +10,7 @@ import os
 import openai
 import json
 import re
+import time
 
 from utils import read_json
 from dbextensions import db
@@ -105,7 +106,11 @@ def init_routes(app):
 
         result = run_skills_chain(llm, product, escaped_steps_and_roles_string, background_info, json_template)
 
-        valid_json = extract_valid_json(result)
+        if result and "Skills" in result:
+            valid_json = extract_valid_json(result)
+        else:
+            time.sleep(5)
+            result = run_skills_chain(llm, product, escaped_steps_and_roles_string, background_info, json_template)
 
         if valid_json is not None:
             print("Extracted valid JSON:", valid_json)
