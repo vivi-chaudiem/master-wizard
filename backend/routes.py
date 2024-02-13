@@ -175,7 +175,7 @@ def init_routes(app):
 def extract_valid_json(json_data):
     # Regex to extract only the valid JSON
     # Looks for the portion of the string that starts with '{' and ends with '}' or starts with '[' and ends with ']', capturing the longest possible match
-    json_regex = re.compile(r'{.*}|[.*]')
+    json_regex = re.compile(r'(\{(?:[^{}]|(?R))*\}|\[(?:[^\[\]]|(?R))*\])')
 
     match = json_regex.search(json_data)
     if match:
