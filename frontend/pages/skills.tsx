@@ -161,15 +161,22 @@ const SkillsPage = () => {
         });
     
         const data = await response.json();
+        console.log('Received data:', data);
 
         if (!Array.isArray(data)) {
           // console.error('Data is not an array:', data);
-          const parsedData = JSON.parse(data);
-          const transformedData = transformData(parsedData);
-          setApiResponseObj(transformedData);
+          try {
+            const parsedData = JSON.parse(data);
+            const transformedData = transformData(parsedData);
+            setApiResponseObj(transformedData);
+            console.log('Data is not an array. transformedData:', transformedData);
+          } catch (error) {
+            console.error('Error parsing JSON:', error);
+          }
         } else {
           const transformedData = transformData(data);
           setApiResponseObj(transformedData);
+          console.log('Data is an array. transformedData:', transformedData);
         }
     
       } catch (error) {

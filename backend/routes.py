@@ -8,6 +8,8 @@ from langchain.document_loaders import TextLoader
 import dotenv
 import os
 import openai
+import json
+import re
 
 from utils import read_file, read_json
 from dbextensions import db
@@ -96,14 +98,20 @@ def init_routes(app):
         json_template = read_json(json_template_path)
 
         result = run_skills_chain(llm, product, escaped_steps_and_roles_string, background_info, json_template)
-        print(result)
+        # print(result)
 
-        response = make_response(jsonify(result))
-        response.headers['Content-Type'] = 'application/json; charset=utf-8'
+        valid_json = extract_valid_json(result)
 
-        return response
+        if valid_json:
+            print("Extracted valid JSON:", valid_json)
+        else:
+            print("No valid JSON found")
+
+        # response = make_response(jsonify(result))
+        # response.headers['Content-Type'] = 'application/json; charset=utf-8'
+
+        return valid_json
         
-
     # Save competencies to database
     @app.route('/api/save-competencies', methods=['POST'])
     @auth.login_required
@@ -161,5 +169,22 @@ def init_routes(app):
             # Handle any errors that may occur during processing
             print(f"An error occurred: {e}")  # Log the error for debugging
             return jsonify({"Fehler": str(e)}), 500
-
+        
     return app
+        
+def extract_valid_json(json_data):
+    # Regex to extract only the valid JSON
+    # Looks for the portion of the string that starts with '{' and ends with '}' or starts with '[' and ends with ']', capturing the longest possible match
+    json_regex = re.compile(r'{.*}|[.*]')
+
+    match = json_regex.search(json_data)
+    if match:
+        json_substring = match.group()
+
+        try:
+            json_object = json.loads(json_substring)
+            return json.dumps(json_object)
+        except json.JSONDecodeError:
+            pass
+
+    return None    
