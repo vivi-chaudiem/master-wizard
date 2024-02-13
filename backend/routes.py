@@ -107,16 +107,16 @@ def init_routes(app):
 
         valid_json = extract_valid_json(result)
 
-        if valid_json:
+        if valid_json is not None:
             print("Extracted valid JSON:", valid_json)
+            return jsonify(valid_json), 200  # Directly use jsonify for Python dict or list
         else:
             print("No valid JSON found")
-            print("Received esult: ", result)
+            print("Received result: ", result)
+            return jsonify({'error': 'Failed to extract valid JSON from the result'}), 400
 
         # response = make_response(jsonify(result))
         # response.headers['Content-Type'] = 'application/json; charset=utf-8'
-
-        return valid_json
         
     # Save competencies to database
     @app.route('/api/save-competencies', methods=['POST'])
@@ -204,8 +204,7 @@ def extract_valid_json(s):
     if boundaries:
         json_str = s[boundaries[0]:boundaries[1]]
         try:
-            json_obj = json.loads(json_str)
-            return json.dumps(json_obj)  # Return a string representation of the JSON object
+            return json.loads(json_str)
         except json.JSONDecodeError:
             pass
     return None

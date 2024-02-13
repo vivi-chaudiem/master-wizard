@@ -163,7 +163,7 @@ const SkillsPage = () => {
         });
     
         const data = await response.json();
-        console.log('Received data:', data);
+        // console.log('Received data:', data);
 
         if (!Array.isArray(data)) {
           // console.error('Data is not an array:', data);

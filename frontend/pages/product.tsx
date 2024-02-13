@@ -49,7 +49,7 @@ const ProductPage = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Error Message: ${response.status}`);
+        throw new Error(`${response.status}`);
       }
 
       const data = await response.json();
@@ -198,7 +198,9 @@ const ProductPage = () => {
             <div className="flex justify-end">
                 <button
                     onClick={handleConfirmClick}
-                    className="bg-blue-950 hover:bg-hover-color text-white font-bold py-2 px-4 rounded-md mt-4">
+                    className="bg-blue-950 hover:bg-hover-color text-white font-bold py-2 px-4 rounded-md mt-4"
+                    disabled={clickedSteps.length === 0} 
+                  >
                     Bestätigen
                 </button>
             </div>
