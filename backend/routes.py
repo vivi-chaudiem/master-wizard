@@ -107,6 +107,7 @@ def init_routes(app):
         result = run_skills_chain(llm, product, escaped_steps_and_roles_string, background_info, json_template)
 
         if result and "Skills" in result:
+            time.sleep(3) # Make sure that the rest loads as well
             valid_json = extract_valid_json(result)
         else:
             time.sleep(5)
