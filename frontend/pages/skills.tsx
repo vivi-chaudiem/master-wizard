@@ -131,7 +131,9 @@ const SkillsPage = () => {
     const steps_and_roles_string = router.query.steps_and_roles_string;
 
     const transformData = (parsedData) => {
-      return parsedData.map(item => ({
+      const dataArray = Array.isArray(parsedData) ? parsedData : [parsedData];
+
+      return dataArray.map(item => ({
         ...item,
         Kompetenzen: Object.fromEntries(
           Object.entries(item.Kompetenzen).map(([category, skillNames]): [string, Skill[]] => [
@@ -166,8 +168,8 @@ const SkillsPage = () => {
         if (!Array.isArray(data)) {
           // console.error('Data is not an array:', data);
           try {
-            const parsedData = JSON.parse(data);
-            const transformedData = transformData(parsedData);
+            // const parsedData = JSON.parse(data);
+            const transformedData = transformData(data);
             setApiResponseObj(transformedData);
             console.log('Data is not an array. transformedData:', transformedData);
           } catch (error) {

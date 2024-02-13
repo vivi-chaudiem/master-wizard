@@ -98,7 +98,6 @@ def init_routes(app):
         json_template = read_json(json_template_path)
 
         result = run_skills_chain(llm, product, escaped_steps_and_roles_string, background_info, json_template)
-        # print(result)
 
         valid_json = extract_valid_json(result)
 
@@ -106,6 +105,7 @@ def init_routes(app):
             print("Extracted valid JSON:", valid_json)
         else:
             print("No valid JSON found")
+            print("Received esult: ", result)
 
         # response = make_response(jsonify(result))
         # response.headers['Content-Type'] = 'application/json; charset=utf-8'
