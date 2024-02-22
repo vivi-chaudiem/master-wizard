@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { Box, Button, Table, Thead, Tr, Th, Tbody, Td, Input, TableContainer, Flex  } from '@chakra-ui/react';
 import { toggleArrayValue } from '../utils/utils';
 import { AdditionalContext } from 'context/additionalcontext';
+import { json } from 'stream/consumers';
 
 interface ArbeitsschrittRolle {
   Arbeitsschritt: string;
@@ -58,6 +59,11 @@ const RolesPage = () => {
   
     const fetchData = async () => {
       setIsLoading(true);
+      let attempts = 0;
+      const maxAttempts = 3;
+
+      while (attempts < maxAttempts) {
+
       try {
         const response = await fetch('/api/get-roles', {
           method: 'POST',
@@ -77,45 +83,35 @@ const RolesPage = () => {
           throw new Error(`Error: ${response.status}`);
         }
 
-        let jsonData;
-        try {
-          // First, try to directly parse the response as JSON
-          jsonData = await response.json();
-        } catch (jsonError) {
-          // If JSON parsing fails, attempt to manually extract and parse the JSON
-          const rawData = await response.text();
-          const startIndex = rawData.indexOf('[');
-          const endIndex = rawData.lastIndexOf(']') + 1; // Include the closing bracket
-          if (startIndex === -1 || endIndex === 0) {
-            throw new Error("JSON data not found in the response");
-          }
-          const jsonString = rawData.substring(startIndex, endIndex);
-          jsonData = JSON.parse(jsonString);
-        }
+        const buffer = await response.arrayBuffer();
+        const decoder = new TextDecoder('utf-8');
+        const text = decoder.decode(buffer);
+        const jsonData = JSON.parse(text);
 
-        console.log('Extracted JSON data:', jsonData);
-        const sortedData = sortApiResponse(jsonData);
-        setApiResponse(sortedData);
+        if (Array.isArray(jsonData)) {
+          setApiResponse(jsonData); 
+        } else {
+          // Case if it's a JSON object
+          const secondParsedJsonData = JSON.parse(jsonData);
+          setApiResponse(secondParsedJsonData);
+        }
   
-        // const data = await response.json();
-        // console.log('Received data:', data);
-        // const parsedData = JSON.parse(data); 
-        // const sortedData = sortApiResponse(parsedData);
-        // setApiResponse(sortedData);
-  
+        break;
       } catch (err: unknown) {
         if (err instanceof Error) {
-          setError(err.message);
+          setError(err.message || "Failed to fetch data after multiple attempts.");
         } else {
           setError('Unbekannter Fehler!');
         }
       } finally {
         setIsLoading(false);
       }
+    }
     };
   
     fetchData();
-  }, [router.query, additionalCompanyInfo, additionalProductInfo, additionalRolesInfo]);  
+  }, [router.query, additionalCompanyInfo, additionalProductInfo, additionalRolesInfo]);
+
 
   const handleConfirmClick = () => {
 

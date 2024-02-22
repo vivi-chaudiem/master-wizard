@@ -40,6 +40,10 @@ const ProductPage = () => {
     setAdditionalSteps([...additionalSteps, '']);
   };
 
+  const handleRemoveAdditionalStep = (index: number) => {
+    setAdditionalSteps((prevSteps) => prevSteps.filter((_, i) => i !== index));
+};
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -91,7 +95,6 @@ const ProductPage = () => {
           },
       });
 
-      console.log('AllSteps:', allSteps);
   } else {
       console.error('apiResponse is null');
   }
@@ -183,6 +186,7 @@ const ProductPage = () => {
                 Optional: Weitere Produktionsschritte:
               </label><br></br>
               {additionalSteps.map((step, index) => (
+            <div key={index} className="flex items-center space-x-2">
                 <input
                   key={index}
                   type="text"
@@ -191,8 +195,10 @@ const ProductPage = () => {
                   value={step}
                   onChange={(e) => handleAdditionalStepChange(index, e.target.value)}
                   className="free-text-field mt-4 w-full resize-y"
-                  placeholder="Weitere Schritte hinzufügen"
+                  placeholder="Weiteren Schritt hinzufügen"
                 />
+                <Button className="mr-2" onClick={() => handleRemoveAdditionalStep(index)}>x</Button>
+            </div>
               ))}
               <button
                 type="button"
