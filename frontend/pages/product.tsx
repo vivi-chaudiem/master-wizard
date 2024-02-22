@@ -13,7 +13,7 @@ const ProductPage = () => {
   const [apiResponse, setApiResponse] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [clickedSteps, setClickedSteps] = useState<number[]>([]);
-  const [additionalStep, setAdditionalStep] = useState('');
+  const [additionalSteps, setAdditionalSteps] = useState<string[]>(['']);
   const activeStepIndex = 1;
   const router = useRouter();
   const [error, setError] = useState('');
@@ -28,6 +28,16 @@ const ProductPage = () => {
     targetStateSetter: React.Dispatch<React.SetStateAction<string>>
   ) => {
     targetStateSetter(e.target.value);
+  };
+
+  const handleAdditionalStepChange = (index: number, value: string) => {
+    const newSteps = [...additionalSteps];
+    newSteps[index] = value;
+    setAdditionalSteps(newSteps);
+  };
+
+  const handleAddAdditionalStep = () => {
+    setAdditionalSteps([...additionalSteps, '']);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -71,18 +81,17 @@ const ProductPage = () => {
           return stepText.replace(/^\d+\.\s*/, '').trim();
       });
 
-      // Add the additional step if it's not empty
-      if (additionalStep.trim() !== '') {
-          selectedSteps.push(additionalStep.trim());
-      }
+      const allSteps = [...selectedSteps, ...additionalSteps.filter(step => step.trim() !== '')];
 
       router.push({
           pathname: '/roles',
           query: {
               product: productInput,
-              clickedSteps: JSON.stringify(selectedSteps),
+              clickedSteps: JSON.stringify(allSteps),
           },
       });
+
+      console.log('AllSteps:', allSteps);
   } else {
       console.error('apiResponse is null');
   }
@@ -173,15 +182,25 @@ const ProductPage = () => {
               <label htmlFor="additionalStep" className="text-xl font-semibold">
                 Optional: Weitere Produktionsschritte:
               </label><br></br>
-              <input
-                type="text"
-                id="additionalStep"
-                name="additionalStep"
-                value={additionalStep}
-                onChange={(e) => handleInputChange(e, setAdditionalStep)}
-                className="free-text-field mt-4 w-full resize-y"
-                placeholder="Weitere Schritte hinzufügen"
-              />
+              {additionalSteps.map((step, index) => (
+                <input
+                  key={index}
+                  type="text"
+                  id={`additionalStep-${index}`}
+                  name={`additionalStep-${index}`}
+                  value={step}
+                  onChange={(e) => handleAdditionalStepChange(index, e.target.value)}
+                  className="free-text-field mt-4 w-full resize-y"
+                  placeholder="Weitere Schritte hinzufügen"
+                />
+              ))}
+              <button
+                type="button"
+                onClick={handleAddAdditionalStep}
+                className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md mt-2"
+              >
+                Weitere Schritte hinzufügen
+              </button>
             </div>
 
             <div className="mt-10">

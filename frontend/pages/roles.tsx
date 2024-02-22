@@ -76,11 +76,32 @@ const RolesPage = () => {
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`);
         }
-  
-        const data = await response.json();
-        const parsedData = JSON.parse(data); 
-        const sortedData = sortApiResponse(parsedData);
+
+        let jsonData;
+        try {
+          // First, try to directly parse the response as JSON
+          jsonData = await response.json();
+        } catch (jsonError) {
+          // If JSON parsing fails, attempt to manually extract and parse the JSON
+          const rawData = await response.text();
+          const startIndex = rawData.indexOf('[');
+          const endIndex = rawData.lastIndexOf(']') + 1; // Include the closing bracket
+          if (startIndex === -1 || endIndex === 0) {
+            throw new Error("JSON data not found in the response");
+          }
+          const jsonString = rawData.substring(startIndex, endIndex);
+          jsonData = JSON.parse(jsonString);
+        }
+
+        console.log('Extracted JSON data:', jsonData);
+        const sortedData = sortApiResponse(jsonData);
         setApiResponse(sortedData);
+  
+        // const data = await response.json();
+        // console.log('Received data:', data);
+        // const parsedData = JSON.parse(data); 
+        // const sortedData = sortApiResponse(parsedData);
+        // setApiResponse(sortedData);
   
       } catch (err: unknown) {
         if (err instanceof Error) {
